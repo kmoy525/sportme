@@ -22,10 +22,18 @@ export async function GET(request: Request) {
     };
   }
 
+  // Cast a wide net: find ANY env var whose value looks like a Blob
+  // read-write token, regardless of what its key is named.
+  const looksLikeBlobToken = Object.entries(process.env)
+    .filter(([, v]) => typeof v === "string" && v.startsWith("vercel_blob_rw_"))
+    .map(([k]) => k);
+
   return NextResponse.json({
     vercelEnv: process.env.VERCEL_ENV ?? null,
     nodeEnv: process.env.NODE_ENV ?? null,
     blobLikeEnvKeys: blobLikeKeys,
+    looksLikeBlobToken,
+    allEnvKeys: Object.keys(process.env).sort(),
     BLOB_READ_WRITE_TOKEN: describe("BLOB_READ_WRITE_TOKEN"),
     SPORTME_PROPICS_BLOB_READ_WRITE_TOKEN: describe("SPORTME_PROPICS_BLOB_READ_WRITE_TOKEN"),
   });
