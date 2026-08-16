@@ -1,0 +1,296 @@
+// TrainWithMe — data model
+// See docs/DATA_MODEL.md for the mapping back to the product spec.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------- enums
+
+enum Sport {
+  bjj
+  running
+  tennis
+  lifting
+}
+
+enum AgeRange {
+  age_18_24   @map("18-24")
+  age_25_34   @map("25-34")
+  age_35_44   @map("35-44")
+  age_45_54   @map("45-54")
+  age_55_plus @map("55+")
+}
+
+enum Belt {
+  white
+  blue
+  purple
+  brown
+  black
+}
+
+enum PreferredContact {
+  email
+  sms
+}
+
+enum AuthProvider {
+  credentials
+  google
+  apple
+}
+
+enum ReportReason {
+  fake_profile
+  harassment
+  inappropriate_photo
+  other
+}
+
+// ---------------------------------------------------------------- auth
+
+/// Created at signup, before onboarding.
+model Account {
+  id            String       @id @default(cuid())
+  email         String?      @unique
+  phone         String?      @unique
+  authProvider  AuthProvider @map("auth_provider")
+  passwordHash  String?      @map("password_hash")
+  ageConfirmed  Boolean      @default(false) @map("age_confirmed")
+  tosAcceptedAt DateTime?    @map("tos_accepted_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  profile Profile?
+
+  @@map("accounts")
+}
+
+// ---------------------------------------------------------------- profile
+
+/// Baseline, sport-agnostic info. Created during onboarding.
+model Profile {
+  id                String           @id @default(cuid())
+  accountId         String           @unique @map("account_id")
+  name              String
+  ageRange          AgeRange         @map("age_range")
+  photoUrl          String?          @map("photo_url")
+  zipCode           String           @map("zip_code")
+  /// Geocoded server-side from zipCode. NEVER serialized to the client.
+  lat               Float
+  /// Geocoded server-side from zipCode. NEVER serialized to the client.
+  lng               Float
+  travelRadiusMiles Int              @default(25) @map("travel_radius_miles")
+  preferredContact  PreferredContact @map("preferred_contact")
+  /// Set true by the report auto-hide threshold. Pending manual review; never deleted.
+  hidden            Boolean          @default(false)
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  sportProfiles   SportProfile[]
+  likesGiven      Like[]         @relation("LikeFrom")
+  likesReceived   Like[]         @relation("LikeTo")
+  passesGiven     Pass[]         @relation("PassFrom")
+  passesReceived  Pass[]         @relation("PassTo")
+  matchesAsA      Match[]        @relation("MatchA")
+  matchesAsB      Match[]        @relation("MatchB")
+  blocksMade      Block[]        @relation("Blocker")
+  blocksAgainst   Block[]        @relation("Blocked")
+  reportsMade     Report[]       @relation("Reporter")
+  reportsAgainst  Report[]       @relation("Reported")
+  messages        Message[]
+  eventsSubmitted Event[]
+  sportRequests   SportRequest[]
+
+  @@index([hidden])
+  @@map("profiles")
+}
+
+/// One row per (profile, sport). Created when a user opts into a sport.
+model SportProfile {
+  id                String   @id @default(cuid())
+  profileId         String   @map("profile_id")
+  sport             Sport
+  optedIntoMatching Boolean  @default(false) @map("opted_into_matching")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  profile Profile          @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  bjj     SportProfileBjj?
+
+  @@unique([profileId, sport])
+  @@index([sport, optedIntoMatching])
+  @@map("sport_profiles")
+}
+
+/// Sport-specific fields for jiu-jitsu. The only sport-specific table in MVP.
+model SportProfileBjj {
+  sportProfileId String  @id @map("sport_profile_id")
+  weight         Int?
+  heightIn       Int?    @map("height_in")
+  belt           Belt
+  /// "N/A" is an allowed value.
+  gym            String?
+
+  sportProfile SportProfile @relation(fields: [sportProfileId], references: [id], onDelete: Cascade)
+
+  @@map("sport_profile_bjj")
+}
+
+// ---------------------------------------------------------------- matching
+
+/// Written on every thumbs-up. One direction.
+model Like {
+  id            String   @id @default(cuid())
+  fromProfileId String   @map("from_profile_id")
+  toProfileId   String   @map("to_profile_id")
+  sport         Sport
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  fromProfile Profile @relation("LikeFrom", fields: [fromProfileId], references: [id], onDelete: Cascade)
+  toProfile   Profile @relation("LikeTo", fields: [toProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([fromProfileId, toProfileId, sport])
+  @@index([toProfileId, sport])
+  @@map("likes")
+}
+
+/// Thumbs-down. Soft, not permanent — cleared when the user asks to see the list again.
+/// Not in the original spec's model list, but required by the specified
+/// "you've run out of people" re-surfacing behaviour.
+model Pass {
+  id            String   @id @default(cuid())
+  fromProfileId String   @map("from_profile_id")
+  toProfileId   String   @map("to_profile_id")
+  sport         Sport
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  fromProfile Profile @relation("PassFrom", fields: [fromProfileId], references: [id], onDelete: Cascade)
+  toProfile   Profile @relation("PassTo", fields: [toProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([fromProfileId, toProfileId, sport])
+  @@map("passes")
+}
+
+/// "Training Partner" in UI. Created automatically on reciprocal likes.
+/// profileAId is always the lexicographically smaller id, so the unique
+/// constraint genuinely dedupes a pair.
+model Match {
+  id        String   @id @default(cuid())
+  profileAId String  @map("profile_a_id")
+  profileBId String  @map("profile_b_id")
+  sport     Sport
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profileA Profile @relation("MatchA", fields: [profileAId], references: [id], onDelete: Cascade)
+  profileB Profile @relation("MatchB", fields: [profileBId], references: [id], onDelete: Cascade)
+  chat     Chat?
+
+  @@unique([profileAId, profileBId, sport])
+  @@map("matches")
+}
+
+// ---------------------------------------------------------------- safety
+
+model Block {
+  blockerProfileId String   @map("blocker_profile_id")
+  blockedProfileId String   @map("blocked_profile_id")
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  blocker Profile @relation("Blocker", fields: [blockerProfileId], references: [id], onDelete: Cascade)
+  blocked Profile @relation("Blocked", fields: [blockedProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerProfileId, blockedProfileId])
+  @@index([blockedProfileId])
+  @@map("blocks")
+}
+
+model Report {
+  id                String       @id @default(cuid())
+  reporterProfileId String       @map("reporter_profile_id")
+  reportedProfileId String       @map("reported_profile_id")
+  reason            ReportReason
+  notes             String?
+  /// Cleared by an admin working the review queue.
+  reviewedAt        DateTime?    @map("reviewed_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  reporter Profile @relation("Reporter", fields: [reporterProfileId], references: [id], onDelete: Cascade)
+  reported Profile @relation("Reported", fields: [reportedProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([reporterProfileId, reportedProfileId])
+  @@index([reportedProfileId])
+  @@map("reports")
+}
+
+// ---------------------------------------------------------------- chat
+
+model Chat {
+  id        String   @id @default(cuid())
+  matchId   String   @unique @map("match_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  match    Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id              String   @id @default(cuid())
+  chatId          String   @map("chat_id")
+  senderProfileId String   @map("sender_profile_id")
+  content         String
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  chat   Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender Profile @relation(fields: [senderProfileId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, createdAt])
+  @@map("messages")
+}
+
+// ---------------------------------------------------------------- events
+
+/// Fed by two sources: admin-curated (createdByProfileId null) and member-submitted.
+model Event {
+  id                 String   @id @default(cuid())
+  sport              Sport
+  name               String
+  locationText       String   @map("location_text")
+  zipCode            String   @map("zip_code")
+  lat                Float
+  lng                Float
+  eventDate          DateTime @map("event_date") @db.Date
+  startTime          String   @map("start_time")
+  expectedSize       String?  @map("expected_size")
+  /// Any external URL — Partiful, Luma, Eventbrite, plain link. No integration.
+  rsvpUrl            String?  @map("rsvp_url")
+  createdByProfileId String?  @map("created_by_profile_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  createdBy Profile? @relation(fields: [createdByProfileId], references: [id], onDelete: SetNull)
+
+  @@index([sport, eventDate])
+  @@map("events")
+}
+
+/// Captured from the homepage search miss empty state.
+model SportRequest {
+  id                 String   @id @default(cuid())
+  requestedSportName String   @map("requested_sport_name")
+  requesterProfileId String?  @map("requester_profile_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  requester Profile? @relation(fields: [requesterProfileId], references: [id], onDelete: SetNull)
+
+  @@map("sport_requests")
+}
