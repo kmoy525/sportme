@@ -48,8 +48,10 @@ export async function uploadProfilePhoto(file: File | null): Promise<PhotoUpload
       token,
     });
     return { ok: true, url: blob.url };
-  } catch {
-    return { ok: false, error: "Photo upload failed. Try again, or continue without one." };
+  } catch (err) {
+    // TEMPORARY: surface the real error for production diagnosis.
+    const detail = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `Photo upload failed: ${detail}` };
   }
 }
 
