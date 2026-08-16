@@ -26,14 +26,14 @@ export default async function ManageSportPage({
 
   return (
     <>
-      <header className="bg-turf px-5 pb-5 pt-6">
+      <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
         <Link
           href="/profile"
-          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-chalk/55 hover:text-chalk"
+          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55 hover:text-ink"
         >
           ← Profile
         </Link>
-        <h1 className="display mt-1.5 text-3xl text-chalk">{meta.label}</h1>
+        <h1 className="display mt-1.5 text-3xl text-ink">{meta.label}</h1>
       </header>
 
       <main className="space-y-6 px-5 py-6">
@@ -50,57 +50,50 @@ export default async function ManageSportPage({
           </Card>
         ) : (
           <>
-            {meta.matchingEnabled ? (
-              <>
-                <Card className="flex items-center justify-between px-4 py-3.5">
-                  <div>
-                    <p className="text-[15px] font-semibold text-ink">Finding partners</p>
-                    <p className="mt-0.5 text-xs text-ink/50">
-                      Turning this off hides you from the deck. Your info stays saved.
-                    </p>
-                  </div>
-                  <form action={setMatchingOptInAction}>
-                    <input type="hidden" name="sport" value={sport} />
-                    <input
-                      type="hidden"
-                      name="optedIn"
-                      value={(!sportProfile.optedIntoMatching).toString()}
-                    />
-                    <button
-                      type="submit"
-                      aria-pressed={sportProfile.optedIntoMatching}
-                      className={
-                        sportProfile.optedIntoMatching
-                          ? "h-8 w-14 shrink-0 rounded-full bg-cone p-1 transition-colors"
-                          : "h-8 w-14 shrink-0 rounded-full bg-ink/15 p-1 transition-colors"
-                      }
-                    >
-                      <span
-                        className={
-                          sportProfile.optedIntoMatching
-                            ? "block h-6 w-6 translate-x-6 rounded-full bg-white transition-transform"
-                            : "block h-6 w-6 translate-x-0 rounded-full bg-white transition-transform"
-                        }
-                      />
-                    </button>
-                  </form>
-                </Card>
-
-                <div>
-                  <h2 className="display mb-3 text-xl text-turf">Your details</h2>
-                  <BjjFieldsForm
-                    sport={sport}
-                    defaults={sportProfile.bjj ?? undefined}
-                    submitLabel="Save changes"
+            <Card className="flex items-center justify-between px-4 py-3.5">
+              <div>
+                <p className="text-[15px] font-semibold text-ink">Finding partners</p>
+                <p className="mt-0.5 text-xs text-ink/50">
+                  Turning this off hides you from the deck. Your info stays saved.
+                </p>
+              </div>
+              <form action={setMatchingOptInAction}>
+                <input type="hidden" name="sport" value={sport} />
+                <input
+                  type="hidden"
+                  name="optedIn"
+                  value={(!sportProfile.optedIntoMatching).toString()}
+                />
+                <button
+                  type="submit"
+                  aria-pressed={sportProfile.optedIntoMatching}
+                  className={
+                    sportProfile.optedIntoMatching
+                      ? "h-8 w-14 shrink-0 rounded-full bg-brand p-1 transition-colors"
+                      : "h-8 w-14 shrink-0 rounded-full bg-ink/15 p-1 transition-colors"
+                  }
+                >
+                  <span
+                    className={
+                      sportProfile.optedIntoMatching
+                        ? "block h-6 w-6 translate-x-6 rounded-full bg-white transition-transform"
+                        : "block h-6 w-6 translate-x-0 rounded-full bg-white transition-transform"
+                    }
                   />
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-ink/60">
-                Partner matching for {meta.lowerLabel} isn&apos;t available yet — you&apos;re
-                joined for events.
-              </p>
-            )}
+                </button>
+              </form>
+            </Card>
+
+            {sport === "bjj" ? (
+              <div>
+                <h2 className="display mb-3 text-xl text-ink">Your details</h2>
+                <BjjFieldsForm
+                  sport={sport}
+                  defaults={sportProfile.bjj ?? undefined}
+                  submitLabel="Save changes"
+                />
+              </div>
+            ) : null}
           </>
         )}
       </main>

@@ -1,37 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Work_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Sora } from "next/font/google";
 import "./globals.css";
 
-// Bold condensed athletic display face — headlines and the match moment.
-const display = Anton({
+// Heavy geometric display face — headlines and the match moment.
+const display = Sora({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-});
-
-// Clean humanist sans — body and UI.
-const body = Work_Sans({
-  variable: "--font-body",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-// Monospace — stat readouts (belt, weight, height).
-const stat = IBM_Plex_Mono({
-  variable: "--font-stat",
-  subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: "800",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "TrainWithMe",
-  description: "Find local training partners and weekly events for your sport.",
+  title: "SportMe",
+  description: "Workouts are better together. Find people to train with, by sport.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1b3b2f",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -41,12 +26,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${display.variable} ${body.variable} ${stat.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" className={display.variable}>
+      <head>
+        {/* General Sans isn't on Google Fonts, so it's loaded via Fontshare's CDN. */}
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap"
+        />
+      </head>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

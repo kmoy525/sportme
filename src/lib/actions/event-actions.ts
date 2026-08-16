@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { prisma } from "../db";
 import { str, type FormState } from "../form";
@@ -9,26 +9,50 @@ import { geocodeZip, isValidZip } from "../geocode";
 import { requireProfile } from "../session";
 import { parseSport } from "../sports";
 
-export async function createEventAction(
-  _prev: FormState,
-  form: FormData,
-): Promise<FormState> {
-  const { profile } = await requireProfile();
+type ParsedEventFields = {
+  fieldErrors: Record<string, string>;
+  values: {
+    sport: ReturnType<typeof parseSport>;
+    name: string;
+    description: string;
+    locationText: string;
+    zipCode: string;
+    date: Date | null;
+    startTime: string;
+    expectedSize: string;
+    rsvpUrl: string;
+    /** Set when Places Autocomplete already resolved coordinates. */
+    resolvedLat: number | null;
+    resolvedLng: number | null;
+  };
+};
 
+/** Shared validation for the event form fields (create + edit). */
+function readEventFields(form: FormData): ParsedEventFields {
   const sport = parseSport(str(form, "sport"));
   const name = str(form, "name");
+  const description = str(form, "description");
   const locationText = str(form, "locationText");
   const zipCode = str(form, "zipCode");
   const eventDate = str(form, "eventDate");
   const startTime = str(form, "startTime");
   const expectedSize = str(form, "expectedSize");
   const rsvpUrl = str(form, "rsvpUrl");
+  const latRaw = str(form, "lat");
+  const lngRaw = str(form, "lng");
 
   const fieldErrors: Record<string, string> = {};
-  if (!sport) return { error: "Unknown sport." };
   if (!name) fieldErrors.name = "Give the event a name.";
   if (!locationText) fieldErrors.locationText = "Where is it?";
-  if (!isValidZip(zipCode)) fieldErrors.zipCode = "Enter a 5-digit US zip code.";
+  // Places Autocomplete may resolve coordinates without a US zip (e.g. a named
+  // venue) — only require a well-formed zip when we don't already have coords.
+  const resolvedLat = latRaw ? Number.parseFloat(latRaw) : null;
+  const resolvedLng = lngRaw ? Number.parseFloat(lngRaw) : null;
+  const hasResolvedCoords =
+    resolvedLat !== null && resolvedLng !== null && !Number.isNaN(resolvedLat) && !Number.isNaN(resolvedLng);
+  if (!hasResolvedCoords && !isValidZip(zipCode)) {
+    fieldErrors.zipCode = "Enter a 5-digit US zip code.";
+  }
   if (!eventDate) fieldErrors.eventDate = "Pick a date.";
   if (!startTime) fieldErrors.startTime = "Pick a start time.";
 
@@ -49,33 +73,120 @@ export async function createEventAction(
     fieldErrors.eventDate = "That date isn't valid.";
   }
 
-  if (!date || Object.keys(fieldErrors).length > 0) return { fieldErrors };
+  return {
+    fieldErrors,
+    values: {
+      sport,
+      name,
+      description,
+      locationText,
+      zipCode,
+      date,
+      startTime,
+      expectedSize,
+      rsvpUrl,
+      resolvedLat: hasResolvedCoords ? resolvedLat : null,
+      resolvedLng: hasResolvedCoords ? resolvedLng : null,
+    },
+  };
+}
 
-  const point = await geocodeZip(zipCode);
-  if (!point) {
-    return {
-      fieldErrors: { zipCode: "We couldn't find that zip code. Check it and retry." },
-    };
+export async function createEventAction(
+  _prev: FormState,
+  form: FormData,
+): Promise<FormState> {
+  const { profile } = await requireProfile();
+
+  const { fieldErrors, values } = readEventFields(form);
+  if (!values.sport) return { error: "Unknown sport." };
+  if (!values.date || Object.keys(fieldErrors).length > 0) return { fieldErrors };
+
+  let point = { lat: values.resolvedLat, lng: values.resolvedLng };
+  if (point.lat === null || point.lng === null) {
+    const geocoded = await geocodeZip(values.zipCode);
+    if (!geocoded) {
+      return {
+        fieldErrors: { zipCode: "We couldn't find that zip code. Check it and retry." },
+      };
+    }
+    point = geocoded;
   }
 
   await prisma.event.create({
     data: {
-      sport,
-      name,
-      locationText,
-      zipCode,
-      lat: point.lat,
-      lng: point.lng,
-      eventDate: date,
-      startTime,
-      expectedSize: expectedSize || null,
-      rsvpUrl: rsvpUrl || null,
+      sport: values.sport,
+      name: values.name,
+      description: values.description || null,
+      locationText: values.locationText,
+      zipCode: values.zipCode,
+      lat: point.lat!,
+      lng: point.lng!,
+      eventDate: values.date,
+      startTime: values.startTime,
+      expectedSize: values.expectedSize || null,
+      rsvpUrl: values.rsvpUrl || null,
       createdByProfileId: profile.id,
     },
   });
 
-  revalidatePath(`/sports/${sport}`);
-  redirect(`/sports/${sport}`);
+  revalidatePath(`/sports/${values.sport}`);
+  redirect(`/sports/${values.sport}`);
+}
+
+/**
+ * Only the member who submitted an event can edit it. Admin-curated events
+ * (createdByProfileId is null) are never user-editable, enforced here —
+ * not just hidden in the UI.
+ */
+export async function updateEventAction(
+  _prev: FormState,
+  form: FormData,
+): Promise<FormState> {
+  const { profile } = await requireProfile();
+  const eventId = str(form, "eventId");
+
+  const existing = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, sport: true, createdByProfileId: true },
+  });
+  if (!existing) notFound();
+  if (existing.createdByProfileId !== profile.id) {
+    return { error: "You can only edit events you created." };
+  }
+
+  const { fieldErrors, values } = readEventFields(form);
+  if (!values.date || Object.keys(fieldErrors).length > 0) return { fieldErrors };
+
+  let point = { lat: values.resolvedLat, lng: values.resolvedLng };
+  if (point.lat === null || point.lng === null) {
+    const geocoded = await geocodeZip(values.zipCode);
+    if (!geocoded) {
+      return {
+        fieldErrors: { zipCode: "We couldn't find that zip code. Check it and retry." },
+      };
+    }
+    point = geocoded;
+  }
+
+  await prisma.event.update({
+    where: { id: eventId },
+    data: {
+      name: values.name,
+      description: values.description || null,
+      locationText: values.locationText,
+      zipCode: values.zipCode,
+      lat: point.lat!,
+      lng: point.lng!,
+      eventDate: values.date,
+      startTime: values.startTime,
+      expectedSize: values.expectedSize || null,
+      rsvpUrl: values.rsvpUrl || null,
+    },
+  });
+
+  revalidatePath(`/sports/${existing.sport}`);
+  revalidatePath(`/events/${eventId}`);
+  redirect(`/events/${eventId}`);
 }
 
 export async function requestSportAction(

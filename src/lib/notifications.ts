@@ -173,3 +173,75 @@ export async function arePartners(a: string, b: string): Promise<boolean> {
   });
   return Boolean(found);
 }
+
+const EPOCH = new Date(0);
+
+/**
+ * Whether the Notifications nav icon should show its unread dot: any pending
+ * like received since the tab was last opened, or any chat message from the
+ * other side since that chat was last opened.
+ */
+export async function hasUnreadNotifications(profileId: string): Promise<boolean> {
+  const [profile, blocked] = await Promise.all([
+    prisma.profile.findUnique({
+      where: { id: profileId },
+      select: { notificationsViewedAt: true },
+    }),
+    blockedIds(profileId),
+  ]);
+  const viewedAt = profile?.notificationsViewedAt ?? EPOCH;
+
+  const [unreadLike, chatIds] = await Promise.all([
+    prisma.like.findFirst({
+      where: {
+        toProfileId: profileId,
+        createdAt: { gt: viewedAt },
+        fromProfileId: blocked.length ? { notIn: blocked } : undefined,
+        fromProfile: { hidden: false },
+      },
+      select: { id: true },
+    }),
+    prisma.chat.findMany({
+      where: { match: { OR: [{ profileAId: profileId }, { profileBId: profileId }] } },
+      select: { id: true },
+    }),
+  ]);
+  if (unreadLike) return true;
+  if (chatIds.length === 0) return false;
+
+  const ids = chatIds.map((c) => c.id);
+  const [reads, latestMessages] = await Promise.all([
+    prisma.chatRead.findMany({
+      where: { profileId, chatId: { in: ids } },
+      select: { chatId: true, lastReadAt: true },
+    }),
+    prisma.message.findMany({
+      where: { chatId: { in: ids }, senderProfileId: { not: profileId } },
+      orderBy: { createdAt: "desc" },
+      distinct: ["chatId"],
+      select: { chatId: true, createdAt: true },
+    }),
+  ]);
+  const lastReadByChat = new Map(reads.map((r) => [r.chatId, r.lastReadAt]));
+
+  return latestMessages.some(
+    (m) => m.createdAt > (lastReadByChat.get(m.chatId) ?? EPOCH),
+  );
+}
+
+/** Marks the Notifications tab as viewed — clears the "unread like" half of the badge. */
+export async function markNotificationsViewed(profileId: string): Promise<void> {
+  await prisma.profile.update({
+    where: { id: profileId },
+    data: { notificationsViewedAt: new Date() },
+  });
+}
+
+/** Marks a chat as read for one side — clears the "unread message" half of the badge. */
+export async function markChatRead(chatId: string, profileId: string): Promise<void> {
+  await prisma.chatRead.upsert({
+    where: { chatId_profileId: { chatId, profileId } },
+    update: { lastReadAt: new Date() },
+    create: { chatId, profileId },
+  });
+}

@@ -9,7 +9,7 @@ import { prisma } from "@/lib/db";
 import { toDeckProfile } from "@/lib/deck";
 import { getCandidates, hasPasses } from "@/lib/matching";
 import { requireProfile } from "@/lib/session";
-import { inviteMessageFor } from "@/lib/invite";
+import { inviteMessage } from "@/lib/invite";
 import { parseSport, SPORT_META, type SportSlug } from "@/lib/sports";
 
 export async function generateMetadata({
@@ -18,8 +18,8 @@ export async function generateMetadata({
   params: Promise<{ sport: string }>;
 }) {
   const sport = parseSport((await params).sport);
-  if (!sport) return { title: "TrainWithMe" };
-  return { title: `${SPORT_META[sport as SportSlug].label} · TrainWithMe` };
+  if (!sport) return { title: "SportMe" };
+  return { title: `${SPORT_META[sport as SportSlug].label} · SportMe` };
 }
 
 export default async function SportPage({
@@ -58,29 +58,39 @@ export default async function SportPage({
     }),
   ]);
 
-  const inviteMessage = inviteMessageFor(meta.lowerLabel, profile.zipCode);
+  const invite = inviteMessage();
 
   return (
     <>
-      {/* 1. Sport name header */}
-      <header className="bg-turf px-5 pb-5 pt-6">
-        <Link
-          href="/"
-          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-chalk/55 hover:text-chalk"
-        >
-          ← All sports
-        </Link>
-        <h1 className="display mt-1.5 text-4xl text-chalk">{meta.label}</h1>
+      {/* 1. Sport name header, with the sport's photo as a banner. */}
+      <header className="relative h-44 overflow-hidden bg-ink">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={meta.imageUrl}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/0" />
+        <div className="relative flex h-full flex-col justify-between px-5 pb-5 pt-6">
+          <Link
+            href="/home"
+            className="stat inline-block w-fit text-[11px] font-semibold uppercase tracking-[0.12em] text-white/80 hover:text-white"
+          >
+            ← All sports
+          </Link>
+          <h1 className="display text-4xl text-white">{meta.label}</h1>
+        </div>
       </header>
 
       <main className="px-5 py-5">
         {/* 2. Compact "+ Add Event" — deliberately not a full-width CTA, so it
             doesn't push Find a Partner below the fold. */}
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="display text-xl text-turf">This week</h2>
+          <h2 className="display text-xl text-ink">This week</h2>
           <Link
             href={`/sports/${sport}/events/new`}
-            className="stat shrink-0 text-xs font-semibold uppercase tracking-[0.08em] text-cone hover:underline"
+            className="stat shrink-0 text-xs font-semibold uppercase tracking-[0.08em] text-brand hover:underline"
           >
             + Add event
           </Link>
@@ -112,16 +122,13 @@ export default async function SportPage({
                 sport={sport}
                 matchPhrase={meta.matchPhrase}
                 viewer={profile}
-                inviteMessage={inviteMessage}
+                inviteMessage={invite}
               />
             ) : (
               <Card className="px-5 py-6 text-center">
-                <p className="display text-lg text-turf">
-                  Want to find a partner for {meta.lowerLabel}?
-                </p>
+                <p className="display text-lg text-ink">{meta.label}</p>
                 <p className="mx-auto mt-2 max-w-xs text-sm text-ink/65">
-                  Add a few details about your training and we&apos;ll show you people
-                  nearby.
+                  Find someone to train with nearby.
                 </p>
                 <div className="mt-4">
                   <ButtonLink href={`/sports/${sport}/opt-in`} size="lg">
@@ -135,7 +142,7 @@ export default async function SportPage({
 
         {/* 5. Invite a friend */}
         <div className="mt-6">
-          <InviteFriendLink message={inviteMessage} />
+          <InviteFriendLink message={invite} />
         </div>
       </main>
     </>

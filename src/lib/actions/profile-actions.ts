@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { prisma } from "../db";
 import { isTravelRadius } from "../distance";
-import { isAgeRange, isPreferredContact } from "../enums";
+import { isAgeRange } from "../enums";
 import { int, str, type FormState } from "../form";
 import { geocodeZip, isValidZip } from "../geocode";
 import { fileFrom, uploadProfilePhoto } from "../photo";
@@ -17,26 +17,21 @@ function readBaseline(form: FormData, fallbackRadius = 25) {
   const ageRangeRaw = str(form, "ageRange");
   const zipCode = str(form, "zipCode");
   const radius = int(form, "travelRadiusMiles") ?? fallbackRadius;
-  const contactRaw = str(form, "preferredContact");
 
   const ageRange = isAgeRange(ageRangeRaw) ? ageRangeRaw : null;
-  const preferredContact = isPreferredContact(contactRaw) ? contactRaw : null;
 
   const fieldErrors: Record<string, string> = {};
   if (!name) fieldErrors.name = "Tell people what to call you.";
   if (!ageRange) fieldErrors.ageRange = "Pick an age range.";
   if (!isValidZip(zipCode)) fieldErrors.zipCode = "Enter a 5-digit US zip code.";
   if (!isTravelRadius(radius)) fieldErrors.travelRadiusMiles = "Pick a travel radius.";
-  if (!preferredContact) {
-    fieldErrors.preferredContact = "Pick how you'd like to be contacted.";
-  }
 
-  if (!ageRange || !preferredContact || Object.keys(fieldErrors).length > 0) {
+  if (!ageRange || Object.keys(fieldErrors).length > 0) {
     return { ok: false as const, fieldErrors };
   }
   return {
     ok: true as const,
-    values: { name, ageRange, zipCode, radius, preferredContact },
+    values: { name, ageRange, zipCode, radius },
   };
 }
 
@@ -46,11 +41,11 @@ export async function onboardingAction(
 ): Promise<FormState> {
   const account = await requireAccount();
   if (!account.ageConfirmed || !account.tosAcceptedAt) redirect("/signup/confirm");
-  if (account.profile) redirect("/");
+  if (account.profile) redirect("/home");
 
   const parsed = readBaseline(form);
   if (!parsed.ok) return { fieldErrors: parsed.fieldErrors };
-  const { name, ageRange, zipCode, radius, preferredContact } = parsed.values;
+  const { name, ageRange, zipCode, radius } = parsed.values;
 
   const point = await geocodeZip(zipCode);
   if (!point) {
@@ -72,11 +67,10 @@ export async function onboardingAction(
       lat: point.lat,
       lng: point.lng,
       travelRadiusMiles: radius,
-      preferredContact,
     },
   });
 
-  redirect("/");
+  redirect("/home");
 }
 
 export async function updateProfileAction(
@@ -87,7 +81,7 @@ export async function updateProfileAction(
 
   const parsed = readBaseline(form, profile.travelRadiusMiles);
   if (!parsed.ok) return { fieldErrors: parsed.fieldErrors };
-  const { name, ageRange, zipCode, radius, preferredContact } = parsed.values;
+  const { name, ageRange, zipCode, radius } = parsed.values;
 
   // Only re-geocode when the zip actually changed.
   let coords = { lat: profile.lat, lng: profile.lng };
@@ -113,7 +107,6 @@ export async function updateProfileAction(
       lat: coords.lat,
       lng: coords.lng,
       travelRadiusMiles: radius,
-      preferredContact,
       ...(photo.url ? { photoUrl: photo.url } : {}),
     },
   });

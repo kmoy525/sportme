@@ -7,17 +7,17 @@ import { oauthSignInAction } from "@/lib/actions/auth-actions";
 import { getAccountId } from "@/lib/session";
 import { buttonClass } from "@/components/ui";
 
-export const metadata = { title: "Create account · TrainWithMe" };
+export const metadata = { title: "Create account · SportMe" };
 
 export default async function SignupPage() {
-  if (await getAccountId()) redirect("/");
+  if (await getAccountId()) redirect("/home");
 
   const { google, apple } = enabledOAuthProviders;
   const anyOAuth = google || apple;
 
   return (
     <div>
-      <h1 className="display text-3xl text-turf">Create your account</h1>
+      <h1 className="display text-3xl text-ink">Create your account</h1>
       <p className="mt-2 text-sm text-ink/65">
         Then you&apos;ll set up your profile once, and it works across every sport.
       </p>
@@ -29,11 +29,11 @@ export default async function SignupPage() {
       {anyOAuth ? (
         <>
           <div className="my-6 flex items-center gap-3">
-            <span className="h-px flex-1 bg-chalk-line" />
+            <span className="h-px flex-1 bg-ink/10" />
             <span className="stat text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">
               or
             </span>
-            <span className="h-px flex-1 bg-chalk-line" />
+            <span className="h-px flex-1 bg-ink/10" />
           </div>
           <div className="space-y-3">
             {google ? (
@@ -67,7 +67,7 @@ export default async function SignupPage() {
 
       <p className="mt-8 text-sm text-ink/65">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-turf underline">
+        <Link href="/login" className="font-semibold text-ink underline">
           Log in
         </Link>
       </p>

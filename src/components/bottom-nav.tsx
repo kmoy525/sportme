@@ -7,22 +7,22 @@ import { BellIcon, HomeIcon, PersonIcon } from "./icons";
 import { cx } from "./ui";
 
 const TABS = [
-  { href: "/", label: "Home", Icon: HomeIcon },
+  { href: "/home", label: "Home", Icon: HomeIcon },
   { href: "/notifications", label: "Notifications", Icon: BellIcon },
   { href: "/profile", label: "Profile", Icon: PersonIcon },
 ] as const;
 
-export function BottomNav({ notificationCount }: { notificationCount: number }) {
+export function BottomNav({ hasNotificationBadge }: { hasNotificationBadge: boolean }) {
   const pathname = usePathname();
 
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-turf-line bg-turf pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-white pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto flex max-w-md">
         {TABS.map(({ href, label, Icon }) => {
-          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const active = pathname.startsWith(href);
           return (
             <li key={href} className="flex-1">
               <Link
@@ -30,25 +30,23 @@ export function BottomNav({ notificationCount }: { notificationCount: number }) 
                 aria-current={active ? "page" : undefined}
                 className={cx(
                   "relative flex flex-col items-center gap-1 py-2.5 transition-colors",
-                  active ? "text-scoreboard" : "text-chalk/60 hover:text-chalk",
+                  active ? "text-brand" : "text-ink/60 hover:text-ink",
                 )}
               >
                 <span className="relative">
                   <Icon className="h-6 w-6" />
-                  {href === "/notifications" && notificationCount > 0 ? (
+                  {href === "/notifications" && hasNotificationBadge ? (
                     <span
-                      className="stat absolute -right-2.5 -top-1.5 min-w-[18px] rounded-full bg-cone px-1 text-center text-[10px] font-semibold leading-[18px] text-white"
-                      aria-label={`${notificationCount} new`}
-                    >
-                      {notificationCount > 9 ? "9+" : notificationCount}
-                    </span>
+                      aria-label="New notifications"
+                      className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-white"
+                    />
                   ) : null}
                 </span>
                 <span className="stat text-[10px] font-semibold uppercase tracking-[0.1em]">
                   {label}
                 </span>
                 {active ? (
-                  <span className="absolute inset-x-5 top-0 h-0.5 rounded-b bg-scoreboard" />
+                  <span className="absolute inset-x-5 top-0 h-0.5 rounded-b bg-brand" />
                 ) : null}
               </Link>
             </li>

@@ -3,11 +3,11 @@ import Link from "next/link";
 import { ChevronRightIcon } from "@/components/icons";
 import { ProfilePhoto } from "@/components/profile-card";
 import { Badge, Card, EmptyState, SectionHeading } from "@/components/ui";
-import { getIncomingLikes, getPartners } from "@/lib/notifications";
+import { getIncomingLikes, getPartners, markNotificationsViewed } from "@/lib/notifications";
 import { requireProfile } from "@/lib/session";
 import { sportLabel } from "@/lib/sports";
 
-export const metadata = { title: "Notifications · TrainWithMe" };
+export const metadata = { title: "Notifications · SportMe" };
 
 export default async function NotificationsPage() {
   const { profile } = await requireProfile();
@@ -15,12 +15,13 @@ export default async function NotificationsPage() {
   const [incoming, partners] = await Promise.all([
     getIncomingLikes(profile.id),
     getPartners(profile.id),
+    markNotificationsViewed(profile.id),
   ]);
 
   return (
     <>
-      <header className="bg-turf px-5 pb-5 pt-6">
-        <h1 className="display text-3xl text-chalk">Notifications</h1>
+      <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
+        <h1 className="display text-3xl text-ink">Notifications</h1>
       </header>
 
       <main className="space-y-7 px-5 py-5">
@@ -37,7 +38,7 @@ export default async function NotificationsPage() {
               {incoming.map((person) => (
                 <li key={person.profileId}>
                   <Link href={`/notifications/${person.profileId}`} className="block">
-                    <Card className="flex items-center gap-3 px-3 py-3 transition-colors hover:border-turf/40">
+                    <Card className="flex items-center gap-3 px-3 py-3 transition-colors hover:border-ink/40">
                       <ProfilePhoto
                         photoUrl={person.photoUrl}
                         name={person.name}
@@ -82,7 +83,7 @@ export default async function NotificationsPage() {
                     }
                     className="block"
                   >
-                    <Card className="flex items-center gap-3 px-3 py-3 transition-colors hover:border-turf/40">
+                    <Card className="flex items-center gap-3 px-3 py-3 transition-colors hover:border-ink/40">
                       <ProfilePhoto
                         photoUrl={partner.photoUrl}
                         name={partner.name}

@@ -41,8 +41,16 @@ async function seedAccount(opts: {
   offsetMiles: number;
   belt: "white" | "blue" | "purple" | "brown" | "black";
   gym: string;
-  weight: number;
-  heightIn: number;
+  weightClass:
+    | "rooster"
+    | "light_feather"
+    | "feather"
+    | "light"
+    | "middle"
+    | "medium_heavy"
+    | "heavy"
+    | "super_heavy"
+    | "ultra_heavy";
 }) {
   const point = nearby(opts.offsetMiles);
 
@@ -69,7 +77,6 @@ async function seedAccount(opts: {
       lat: point.lat,
       lng: point.lng,
       travelRadiusMiles: 25,
-      preferredContact: "email",
     },
   });
 
@@ -86,8 +93,7 @@ async function seedAccount(opts: {
       sportProfileId: sportProfile.id,
       belt: opts.belt,
       gym: opts.gym,
-      weight: opts.weight,
-      heightIn: opts.heightIn,
+      weightClass: opts.weightClass,
     },
   });
 
@@ -97,40 +103,38 @@ async function seedAccount(opts: {
 async function main() {
   console.log("Seeding demo BJJ profiles…");
   await seedAccount({
-    email: "demo-alex@trainwithme.test",
+    email: "demo-alex@sportme.test",
     name: "Alex Rivera",
     ageRange: "age_25_34",
     offsetMiles: 2,
     belt: "blue",
     gym: "Gracie Barra Downtown",
-    weight: 170,
-    heightIn: 70,
+    weightClass: "middle",
   });
   await seedAccount({
-    email: "demo-sam@trainwithme.test",
+    email: "demo-sam@sportme.test",
     name: "Sam Okafor",
     ageRange: "age_35_44",
     offsetMiles: 6,
     belt: "purple",
     gym: "10th Planet",
-    weight: 190,
-    heightIn: 73,
+    weightClass: "medium_heavy",
   });
   await seedAccount({
-    email: "demo-jordan@trainwithme.test",
+    email: "demo-jordan@sportme.test",
     name: "Jordan Lee",
     ageRange: "age_18_24",
     offsetMiles: 12,
     belt: "white",
     gym: "N/A",
-    weight: 155,
-    heightIn: 67,
+    weightClass: "light",
   });
 
   console.log("Seeding curated events…");
   const events: Array<{
     sport: "bjj" | "running" | "tennis" | "lifting";
     name: string;
+    description: string;
     locationText: string;
     dayOffset: number;
     startTime: string;
@@ -140,6 +144,7 @@ async function main() {
     {
       sport: "bjj",
       name: "Sunday Open Mat",
+      description: "Casual rolling for all levels. Bring a gi or come no-gi — mats open at 10.",
       locationText: "Gracie Barra Downtown",
       dayOffset: 3,
       startTime: "10:00",
@@ -149,6 +154,7 @@ async function main() {
     {
       sport: "bjj",
       name: "No-Gi Fundamentals",
+      description: "A structured class on takedowns and guard passing before open rolling.",
       locationText: "10th Planet",
       dayOffset: 5,
       startTime: "18:30",
@@ -158,6 +164,7 @@ async function main() {
     {
       sport: "running",
       name: "Sunrise 5K Group Run",
+      description: "Easy-pace loop around the lake, regroup at the halfway point. All paces welcome.",
       locationText: "Green Lake Park",
       dayOffset: 2,
       startTime: "06:30",
@@ -167,6 +174,7 @@ async function main() {
     {
       sport: "tennis",
       name: "Doubles Meetup",
+      description: "Rotating doubles, all levels. Bring a racquet — a few loaners available.",
       locationText: "Volunteer Park Courts",
       dayOffset: 4,
       startTime: "17:00",
@@ -176,6 +184,7 @@ async function main() {
     {
       sport: "lifting",
       name: "Saturday Strength Session",
+      description: "Small-group strength session. Programming provided, scale to your level.",
       locationText: "Iron Yard Gym",
       dayOffset: 6,
       startTime: "09:00",
@@ -194,6 +203,7 @@ async function main() {
       data: {
         sport: e.sport,
         name: e.name,
+        description: e.description,
         locationText: e.locationText,
         zipCode: HUB.zip,
         lat: HUB.lat,

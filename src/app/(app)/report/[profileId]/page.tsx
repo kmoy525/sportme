@@ -28,15 +28,15 @@ export default async function ReportPage({
 
   return (
     <>
-      <header className="bg-turf px-5 pb-5 pt-6">
+      <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
         <Link
           href="/notifications"
-          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-chalk/55 hover:text-chalk"
+          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55 hover:text-ink"
         >
           ← Back
         </Link>
-        <h1 className="display mt-1.5 text-3xl text-chalk">Report {target.name}</h1>
-        <p className="mt-1 text-sm text-chalk/70">
+        <h1 className="display mt-1.5 text-3xl text-ink">Report {target.name}</h1>
+        <p className="mt-1 text-sm text-ink/70">
           We&apos;ll review this. Profiles with multiple reports are hidden automatically
           while we look into it.
         </p>
@@ -45,7 +45,7 @@ export default async function ReportPage({
       <main className="space-y-6 px-5 py-6">
         <ReportForm profileId={target.id} name={target.name} />
 
-        <div className="border-t border-chalk-line pt-5">
+        <div className="border-t border-ink/10 pt-5">
           <p className="mb-3 text-sm text-ink/60">
             Just want to stop seeing {target.name}? You can block without reporting.
           </p>

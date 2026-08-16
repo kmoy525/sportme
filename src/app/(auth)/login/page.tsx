@@ -7,16 +7,16 @@ import { oauthSignInAction } from "@/lib/actions/auth-actions";
 import { enabledOAuthProviders } from "@/lib/auth";
 import { getAccountId } from "@/lib/session";
 
-export const metadata = { title: "Log in · TrainWithMe" };
+export const metadata = { title: "Log in · SportMe" };
 
 export default async function LoginPage() {
-  if (await getAccountId()) redirect("/");
+  if (await getAccountId()) redirect("/home");
 
   const { google, apple } = enabledOAuthProviders;
 
   return (
     <div>
-      <h1 className="display text-3xl text-turf">Log in</h1>
+      <h1 className="display text-3xl text-ink">Log in</h1>
 
       <div className="mt-6">
         <LoginForm />
@@ -51,7 +51,7 @@ export default async function LoginPage() {
 
       <p className="mt-8 text-sm text-ink/65">
         New here?{" "}
-        <Link href="/signup" className="font-semibold text-turf underline">
+        <Link href="/signup" className="font-semibold text-ink underline">
           Create an account
         </Link>
       </p>

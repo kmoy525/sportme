@@ -1,53 +1,43 @@
 @import "tailwindcss";
 
 /*
-  TrainWithMe — scrappy local rec league.
-  Not a dating app, not a corporate gym app.
+  SportMe — clean, geometric, pill-shaped. White background, charcoal text,
+  coral-red accent.
 */
 @theme {
-  --color-turf: #1b3b2f; /* primary / nav */
-  --color-turf-dark: #132a21; /* nav pressed / deeper turf */
-  --color-turf-line: #2f5545; /* hairlines on turf */
-  --color-chalk: #f5f3ed; /* background */
-  --color-chalk-line: #e2ded2; /* hairlines on chalk */
-  --color-cone: #ff6b35; /* primary actions */
-  --color-scoreboard: #f2c230; /* badges, notifications, celebration */
-  --color-ink: #141414; /* text */
+  --color-ink: #262626; /* headlines / primary text */
+  --color-brand: #ff4754; /* primary accent — buttons, links, highlights */
 
-  --font-display: var(--font-display), "Arial Narrow", sans-serif;
-  --font-sans: var(--font-body), system-ui, sans-serif;
-  --font-mono: var(--font-stat), ui-monospace, monospace;
+  --font-display: var(--font-display), "Arial", sans-serif;
+  --font-sans: "General Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 0.5rem;
+  --radius-card: 1.5rem;
 }
 
-/* Single committed look — this is a field-side scoreboard, not a themeable app. */
 html {
-  background: var(--color-turf);
+  background: #ffffff;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--color-chalk);
+  background: #ffffff;
   color: var(--color-ink);
   font-family: var(--font-sans);
   overscroll-behavior-y: none;
 }
 
-/* Condensed athletic display face — headlines and the match moment. */
+/* Heavy geometric display face — headlines and the match moment. */
 .display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
-/* Monospace stat readouts — belt, weight, height. */
+/* Small uppercase tracked label — belt, gym, event day/time. */
 .stat {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -60,7 +50,7 @@ body {
   }
 }
 
-/* ---- match celebration: lightning flash + scoreboard readout ---- */
+/* ---- match celebration: full-screen coral flash ---- */
 
 @keyframes twm-flash {
   0% {
@@ -98,7 +88,7 @@ body {
   }
 }
 
-/* Each character drops in like a split-flap scoreboard. */
+/* Each character drops in one at a time. */
 @keyframes twm-flip-in {
   0% {
     opacity: 0;

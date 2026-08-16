@@ -5,14 +5,13 @@ import { useActionState } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Field, FormError, inputClass } from "@/components/ui";
 import { optInSportAction } from "@/lib/actions/sport-actions";
-import { BELT_OPTIONS } from "@/lib/enums";
+import { BELT_OPTIONS, WEIGHT_CLASS_OPTIONS } from "@/lib/enums";
 import { emptyFormState, fieldError } from "@/lib/form";
 
 export type BjjDefaults = {
   belt?: string;
   gym?: string | null;
-  weight?: number | null;
-  heightIn?: number | null;
+  weightClass?: string | null;
 };
 
 export function BjjFieldsForm({
@@ -26,9 +25,6 @@ export function BjjFieldsForm({
 }) {
   const [state, action] = useActionState(optInSportAction, emptyFormState);
 
-  const feet = defaults.heightIn ? Math.floor(defaults.heightIn / 12) : undefined;
-  const inches = defaults.heightIn ? defaults.heightIn % 12 : undefined;
-
   return (
     <form action={action} className="space-y-5">
       <input type="hidden" name="sport" value={sport} />
@@ -39,7 +35,7 @@ export function BjjFieldsForm({
           {BELT_OPTIONS.map((belt) => (
             <label
               key={belt.value}
-              className="flex cursor-pointer flex-col items-center gap-1.5 rounded-md border border-turf/20 bg-white py-2.5 text-center transition-colors has-[:checked]:border-cone has-[:checked]:bg-cone/5"
+              className="flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl border border-ink/15 bg-white py-2.5 text-center transition-colors has-[:checked]:border-brand has-[:checked]:bg-brand/5"
             >
               <input
                 type="radio"
@@ -51,7 +47,7 @@ export function BjjFieldsForm({
               />
               <span
                 aria-hidden
-                className="h-5 w-5 rounded-sm border border-ink/25"
+                className="h-5 w-5 rounded-full border border-ink/25"
                 style={{ background: belt.swatch }}
               />
               <span className="stat text-[9px] font-semibold uppercase tracking-[0.06em] text-ink/70">
@@ -73,46 +69,23 @@ export function BjjFieldsForm({
         />
       </Field>
 
-      <Field label="Weight" hint="Optional." error={fieldError(state, "weight")}>
-        <div className="flex items-center gap-2">
-          <input
-            name="weight"
-            type="number"
-            inputMode="numeric"
-            min={60}
-            max={600}
-            defaultValue={defaults.weight ?? ""}
-            className={inputClass}
-          />
-          <span className="stat text-xs uppercase tracking-[0.1em] text-ink/50">lb</span>
-        </div>
-      </Field>
-
-      <Field label="Height" hint="Optional." error={fieldError(state, "height")}>
-        <div className="flex items-center gap-2">
-          <input
-            name="heightFeet"
-            type="number"
-            inputMode="numeric"
-            min={3}
-            max={8}
-            defaultValue={feet ?? ""}
-            aria-label="Height, feet"
-            className={inputClass}
-          />
-          <span className="stat text-xs uppercase tracking-[0.1em] text-ink/50">ft</span>
-          <input
-            name="heightInches"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={11}
-            defaultValue={inches ?? ""}
-            aria-label="Height, inches"
-            className={inputClass}
-          />
-          <span className="stat text-xs uppercase tracking-[0.1em] text-ink/50">in</span>
-        </div>
+      <Field
+        label="Weight class"
+        hint="Optional. Standard BJJ weight classes."
+        error={fieldError(state, "weightClass")}
+      >
+        <select
+          name="weightClass"
+          defaultValue={defaults.weightClass ?? ""}
+          className={inputClass}
+        >
+          <option value="">Prefer not to say</option>
+          {WEIGHT_CLASS_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
       </Field>
 
       <SubmitButton size="lg" pendingLabel="Saving…">

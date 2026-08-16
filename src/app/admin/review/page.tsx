@@ -88,7 +88,7 @@ export default async function AdminReviewPage({
                   <input type="hidden" name="profileId" value={p.id} />
                   <button
                     type="submit"
-                    className="rounded-md bg-turf px-3 py-2 text-sm font-semibold text-white"
+                    className="rounded-full bg-ink px-3 py-2 text-sm font-semibold text-white"
                   >
                     Clear &amp; unhide
                   </button>
@@ -98,7 +98,7 @@ export default async function AdminReviewPage({
                   <input type="hidden" name="profileId" value={p.id} />
                   <button
                     type="submit"
-                    className="rounded-md border border-red-300 px-3 py-2 text-sm font-semibold text-red-700"
+                    className="rounded-full border border-red-300 px-3 py-2 text-sm font-semibold text-red-700"
                   >
                     Confirm — keep hidden
                   </button>

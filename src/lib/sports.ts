@@ -13,6 +13,11 @@ type SportMeta = {
   matchPhrase: string;
   /** Whether "Find a Partner" is built for this sport yet (MVP: jiu-jitsu only). */
   matchingEnabled: boolean;
+  /**
+   * One real photo per sport (Unsplash), reused across the landing page, the
+   * homepage sport card, and the sport page header.
+   */
+  imageUrl: string;
   /** Extra strings the homepage search should match on. */
   searchTerms: string[];
 };
@@ -23,6 +28,8 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     lowerLabel: "jiu-jitsu",
     matchPhrase: "Let's roll",
     matchingEnabled: true,
+    imageUrl:
+      "https://images.unsplash.com/photo-1585537884613-1a9bcd024983?auto=format&fit=crop&w=1200&q=80",
     searchTerms: [
       "bjj",
       "jiu-jitsu",
@@ -41,21 +48,27 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     label: "Running",
     lowerLabel: "running",
     matchPhrase: "Let's run",
-    matchingEnabled: false,
+    matchingEnabled: true,
+    imageUrl:
+      "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&w=1200&q=80",
     searchTerms: ["run", "running", "jog", "jogging", "5k", "10k", "marathon", "track"],
   },
   tennis: {
     label: "Tennis",
     lowerLabel: "tennis",
     matchPhrase: "Let's play",
-    matchingEnabled: false,
+    matchingEnabled: true,
+    imageUrl:
+      "https://images.unsplash.com/photo-1548920168-70d61248a912?auto=format&fit=crop&w=1200&q=80",
     searchTerms: ["tennis", "singles", "doubles", "racquet", "racket"],
   },
   lifting: {
     label: "Lifting",
     lowerLabel: "lifting",
     matchPhrase: "Let's lift",
-    matchingEnabled: false,
+    matchingEnabled: true,
+    imageUrl:
+      "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",
     searchTerms: [
       "lift",
       "lifting",

@@ -43,16 +43,16 @@ export function SignupForm() {
       </Field>
 
       <div>
-        <label className="flex items-start gap-3 rounded-md border border-turf/20 bg-white p-3">
+        <label className="flex items-start gap-3 rounded-2xl border border-ink/15 bg-white p-3">
           <input
             name="ageConfirmed"
             type="checkbox"
             required
-            className="mt-0.5 h-5 w-5 shrink-0 accent-[#ff6b35]"
+            className="mt-0.5 h-5 w-5 shrink-0 accent-[#ff4754]"
           />
           <span className="text-sm text-ink">
             I confirm I am 18 or older and agree to the{" "}
-            <Link href="/terms" className="font-semibold text-turf underline">
+            <Link href="/terms" className="font-semibold text-ink underline">
               Terms of Service
             </Link>
             .

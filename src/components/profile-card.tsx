@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 import type { DeckProfile } from "@/lib/deck";
-import { ageRangeLabel, beltLabel, beltSwatch, formatHeight, formatWeight } from "@/lib/enums";
+import { ageRangeLabel, beltLabel, beltSwatch, weightClassLabel } from "@/lib/enums";
 
 import { FlagIcon } from "./icons";
-import { Card, Stat } from "./ui";
+import { Badge, Card, Stat } from "./ui";
 
 /**
  * Small, corner-anchored photo — deliberately not full-bleed, to keep this
@@ -25,7 +25,7 @@ export function ProfilePhoto({
     return (
       <div
         aria-hidden
-        className={`${box} flex shrink-0 items-center justify-center rounded-md bg-turf text-chalk`}
+        className={`${box} flex shrink-0 items-center justify-center rounded-full bg-brand text-white`}
       >
         <span className="display text-xl">{name.slice(0, 1).toUpperCase()}</span>
       </div>
@@ -38,7 +38,7 @@ export function ProfilePhoto({
     <img
       src={photoUrl}
       alt={name}
-      className={`${box} shrink-0 rounded-md object-cover`}
+      className={`${box} shrink-0 rounded-full object-cover`}
       loading="lazy"
     />
   );
@@ -53,10 +53,10 @@ export function ProfileCard({
 }) {
   return (
     <Card className="overflow-hidden">
-      <div className="flex items-start gap-3 border-b border-chalk-line px-4 py-4">
+      <div className="flex items-start gap-3 border-b border-ink/10 px-4 py-4">
         <ProfilePhoto photoUrl={profile.photoUrl} name={profile.name} />
         <div className="min-w-0 flex-1">
-          <h3 className="display truncate text-2xl text-turf">{profile.name}</h3>
+          <h3 className="display truncate text-2xl text-ink">{profile.name}</h3>
           <p className="stat text-[11px] uppercase tracking-[0.12em] text-ink/50">
             {ageRangeLabel(profile.ageRange)}
           </p>
@@ -72,20 +72,23 @@ export function ProfileCard({
       </div>
 
       {profile.bjj ? (
-        <div className="bg-turf/[0.04] px-4 py-3">
+        <div className="bg-ink/[0.03] px-4 py-3">
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <div className="flex items-center gap-2">
               <span
                 aria-hidden
-                className="h-4 w-4 rounded-sm border border-ink/20"
+                className="h-4 w-4 rounded-full border border-ink/20"
                 style={{ background: beltSwatch(profile.bjj.belt) }}
               />
               <Stat label="Belt" value={beltLabel(profile.bjj.belt)} />
             </div>
             <Stat label="Gym" value={profile.bjj.gym || "—"} />
-            <Stat label="Weight" value={formatWeight(profile.bjj.weight)} />
-            <Stat label="Height" value={formatHeight(profile.bjj.heightIn)} />
           </div>
+          {profile.bjj.weightClass ? (
+            <div className="mt-3">
+              <Badge tone="muted">{weightClassLabel(profile.bjj.weightClass)}</Badge>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

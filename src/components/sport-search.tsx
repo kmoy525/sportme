@@ -66,10 +66,17 @@ function SportCard({ slug, joined, eventCount }: SportCardData) {
 
   return (
     <Link href={`/sports/${slug}`} className="block">
-      <Card className="flex items-center gap-4 px-4 py-4 transition-colors hover:border-turf/40">
+      <Card className="flex items-center gap-3 overflow-hidden py-3 pl-3 pr-4 transition-colors hover:border-ink/25">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={meta.imageUrl}
+          alt=""
+          aria-hidden
+          className="h-14 w-14 shrink-0 rounded-2xl object-cover"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="display truncate text-2xl text-turf">{meta.label}</h3>
+            <h3 className="display truncate text-2xl text-ink">{meta.label}</h3>
             {joined ? <Badge tone="muted">Joined</Badge> : null}
           </div>
           <p className="stat mt-1 text-[11px] uppercase tracking-[0.1em] text-ink/50">
@@ -91,7 +98,7 @@ function SportRequest({ query }: { query: string }) {
   if (state.success) {
     return (
       <Card className="mt-4 px-5 py-6 text-center">
-        <p className="display text-lg text-turf">Got it — request sent</p>
+        <p className="display text-lg text-ink">Got it — request sent</p>
         <p className="mt-2 text-sm text-ink/65">
           We&apos;ll let you know if it opens up near you.
         </p>
@@ -101,7 +108,7 @@ function SportRequest({ query }: { query: string }) {
 
   return (
     <Card className="mt-4 px-5 py-6">
-      <p className="display text-lg text-turf">
+      <p className="display text-lg text-ink">
         We don&apos;t have that sport yet — want to request it?
       </p>
       <form action={action} className="mt-4 space-y-3">
@@ -128,7 +135,7 @@ function SportRequest({ query }: { query: string }) {
         {SPORTS.map((s, i) => (
           <span key={s}>
             {i > 0 ? " · " : ""}
-            <Link href={`/sports/${s}`} className="font-semibold text-turf underline">
+            <Link href={`/sports/${s}`} className="font-semibold text-ink underline">
               {SPORT_META[s].label}
             </Link>
           </span>

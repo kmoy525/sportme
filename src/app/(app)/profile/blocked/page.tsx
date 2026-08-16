@@ -6,7 +6,7 @@ import { unblockProfileAction } from "@/lib/actions/safety-actions";
 import { prisma } from "@/lib/db";
 import { requireProfile } from "@/lib/session";
 
-export const metadata = { title: "Blocked members · TrainWithMe" };
+export const metadata = { title: "Blocked members · SportMe" };
 
 export default async function BlockedListPage() {
   const { profile } = await requireProfile();
@@ -22,14 +22,14 @@ export default async function BlockedListPage() {
 
   return (
     <>
-      <header className="bg-turf px-5 pb-5 pt-6">
+      <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
         <Link
           href="/profile"
-          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-chalk/55 hover:text-chalk"
+          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55 hover:text-ink"
         >
           ← Profile
         </Link>
-        <h1 className="display mt-1.5 text-3xl text-chalk">Blocked members</h1>
+        <h1 className="display mt-1.5 text-3xl text-ink">Blocked members</h1>
       </header>
 
       <main className="px-5 py-6">
@@ -52,7 +52,7 @@ export default async function BlockedListPage() {
                     <input type="hidden" name="profileId" value={b.blockedProfileId} />
                     <button
                       type="submit"
-                      className="stat shrink-0 text-xs font-semibold uppercase tracking-[0.08em] text-turf hover:underline"
+                      className="stat shrink-0 text-xs font-semibold uppercase tracking-[0.08em] text-ink hover:underline"
                     >
                       Unblock
                     </button>

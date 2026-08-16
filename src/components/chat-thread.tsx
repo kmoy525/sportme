@@ -125,8 +125,8 @@ export function ChatThread({
             <p
               className={
                 message.fromViewer
-                  ? "max-w-[80%] rounded-xl rounded-br-sm bg-turf px-3 py-2 text-[15px] text-chalk"
-                  : "max-w-[80%] rounded-xl rounded-bl-sm border border-chalk-line bg-white px-3 py-2 text-[15px] text-ink"
+                  ? "max-w-[80%] rounded-xl rounded-br-sm bg-white px-3 py-2 text-[15px] text-ink"
+                  : "max-w-[80%] rounded-xl rounded-bl-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
               }
             >
               {message.content}
@@ -147,7 +147,7 @@ export function ChatThread({
                 setDraft(prompt);
                 inputRef.current?.focus();
               }}
-              className="rounded-full border border-turf/25 bg-white px-3 py-1.5 text-sm font-medium text-turf transition-colors hover:border-turf/50 hover:bg-turf/5"
+              className="rounded-full border border-ink/25 bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink/50 hover:bg-ink/5"
             >
               {prompt}
             </button>
@@ -155,7 +155,7 @@ export function ChatThread({
         </div>
       ) : null}
 
-      <div className="sticky bottom-0 border-t border-chalk-line bg-chalk px-5 py-3">
+      <div className="sticky bottom-0 border-t border-ink/10 bg-white px-5 py-3">
         <FormError>{error}</FormError>
         <form
           onSubmit={(e) => {
@@ -176,7 +176,7 @@ export function ChatThread({
           <button
             type="submit"
             disabled={pending || draft.trim().length === 0}
-            className="h-11 shrink-0 rounded-md bg-cone px-4 text-[15px] font-semibold text-white transition-colors hover:bg-cone/90 disabled:opacity-40"
+            className="h-11 shrink-0 rounded-full bg-brand px-5 text-[15px] font-semibold text-white transition-colors hover:bg-brand/90 disabled:opacity-40"
           >
             Send
           </button>

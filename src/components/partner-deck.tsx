@@ -97,19 +97,19 @@ export function PartnerDeck({
     if (hadPasses || passedHere) {
       return (
         <Card className="px-5 py-7 text-center">
-          <p className="display text-lg text-turf">
+          <p className="display text-lg text-ink">
             You&apos;ve run out of people, would you like to see the list again?
           </p>
           <form action={seeListAgainAction} className="mt-4">
             <input type="hidden" name="sport" value={sport} />
             <button
               type="submit"
-              className="h-11 w-full rounded-md bg-cone px-4 text-[15px] font-semibold text-white transition-colors hover:bg-cone/90"
+              className="h-11 w-full rounded-full bg-brand px-4 text-[15px] font-semibold text-white transition-colors hover:bg-brand/90"
             >
               Show me the list again
             </button>
           </form>
-          <div className="mt-4 border-t border-chalk-line pt-4">
+          <div className="mt-4 border-t border-ink/10 pt-4">
             <p className="mb-3 text-sm text-ink/60">Or bring someone new in:</p>
             <InviteFriendButtons message={inviteMessage} />
           </div>
@@ -119,7 +119,7 @@ export function PartnerDeck({
 
     return (
       <Card className="px-5 py-7 text-center">
-        <p className="display text-lg text-turf">
+        <p className="display text-lg text-ink">
           No one else nearby yet — invite a training partner to get things going
         </p>
         <div className="mt-4">
@@ -143,7 +143,7 @@ export function PartnerDeck({
           onClick={onThumbsDown}
           disabled={pending}
           aria-label="Pass"
-          className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-turf/20 bg-white text-turf/60 transition-colors hover:border-turf/40 hover:text-turf active:scale-95 disabled:opacity-50"
+          className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ink/20 bg-white text-ink/60 transition-colors hover:border-ink/40 hover:text-ink active:scale-95 disabled:opacity-50"
         >
           <ThumbDownIcon className="h-7 w-7" />
         </button>
@@ -152,7 +152,7 @@ export function PartnerDeck({
           onClick={onThumbsUp}
           disabled={pending}
           aria-label="Train with them"
-          className="flex h-20 w-20 items-center justify-center rounded-full bg-cone text-white shadow-[0_4px_0_rgba(20,20,20,0.15)] transition-transform hover:bg-cone/90 active:scale-95 disabled:opacity-50"
+          className="flex h-20 w-20 items-center justify-center rounded-full bg-brand text-white shadow-[0_4px_0_rgba(20,20,20,0.15)] transition-transform hover:bg-brand/90 active:scale-95 disabled:opacity-50"
         >
           <ThumbUpIcon className="h-9 w-9" />
         </button>

@@ -1,4 +1,4 @@
-import type { AgeRange, Belt, PreferredContact, ReportReason } from "@/generated/prisma/enums";
+import type { AgeRange, Belt, ReportReason, WeightClass } from "@/generated/prisma/enums";
 
 export const AGE_RANGE_OPTIONS: { value: AgeRange; label: string }[] = [
   { value: "age_18_24", label: "18-24" },
@@ -16,9 +16,17 @@ export const BELT_OPTIONS: { value: Belt; label: string; swatch: string }[] = [
   { value: "black", label: "Black", swatch: "#141414" },
 ];
 
-export const PREFERRED_CONTACT_OPTIONS: { value: PreferredContact; label: string }[] = [
-  { value: "email", label: "Email" },
-  { value: "sms", label: "Text message" },
+/// Standard BJJ weight classes, rooster to ultra heavy.
+export const WEIGHT_CLASS_OPTIONS: { value: WeightClass; label: string }[] = [
+  { value: "rooster", label: "Rooster" },
+  { value: "light_feather", label: "Light Feather" },
+  { value: "feather", label: "Feather" },
+  { value: "light", label: "Light" },
+  { value: "middle", label: "Middle" },
+  { value: "medium_heavy", label: "Medium Heavy" },
+  { value: "heavy", label: "Heavy" },
+  { value: "super_heavy", label: "Super Heavy" },
+  { value: "ultra_heavy", label: "Ultra Heavy" },
 ];
 
 export const REPORT_REASON_OPTIONS: { value: ReportReason; label: string }[] = [
@@ -40,6 +48,11 @@ export function beltSwatch(value: string): string {
   return BELT_OPTIONS.find((o) => o.value === value)?.swatch ?? "#141414";
 }
 
+export function weightClassLabel(value: string | null): string {
+  if (!value) return "—";
+  return WEIGHT_CLASS_OPTIONS.find((o) => o.value === value)?.label ?? value;
+}
+
 export function reportReasonLabel(value: string): string {
   return REPORT_REASON_OPTIONS.find((o) => o.value === value)?.label ?? value;
 }
@@ -52,20 +65,10 @@ export function isBelt(value: string): value is Belt {
   return BELT_OPTIONS.some((o) => o.value === value);
 }
 
-export function isPreferredContact(value: string): value is PreferredContact {
-  return PREFERRED_CONTACT_OPTIONS.some((o) => o.value === value);
+export function isWeightClass(value: string): value is WeightClass {
+  return WEIGHT_CLASS_OPTIONS.some((o) => o.value === value);
 }
 
 export function isReportReason(value: string): value is ReportReason {
   return REPORT_REASON_OPTIONS.some((o) => o.value === value);
-}
-
-/** Height in inches -> 5'11" */
-export function formatHeight(heightIn: number | null): string {
-  if (!heightIn) return "—";
-  return `${Math.floor(heightIn / 12)}'${heightIn % 12}"`;
-}
-
-export function formatWeight(weight: number | null): string {
-  return weight ? `${weight} lb` : "—";
 }

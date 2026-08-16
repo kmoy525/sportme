@@ -18,15 +18,15 @@ export default async function NewEventPage({
 
   return (
     <>
-      <header className="bg-turf px-5 pb-5 pt-6">
+      <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
         <Link
           href={`/sports/${sport}`}
-          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-chalk/55 hover:text-chalk"
+          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55 hover:text-ink"
         >
           ← {meta.label}
         </Link>
-        <h1 className="display mt-1.5 text-3xl text-chalk">Add an event</h1>
-        <p className="mt-1 text-sm text-chalk/70">
+        <h1 className="display mt-1.5 text-3xl text-ink">Add an event</h1>
+        <p className="mt-1 text-sm text-ink/70">
           Open mats, group runs, court time — anything the {meta.lowerLabel} crowd
           should know about.
         </p>

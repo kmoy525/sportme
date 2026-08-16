@@ -1,5 +1,5 @@
 {
-  "name": "trainwithme",
+  "name": "sportme",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -30,6 +30,7 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
+    "@types/google.maps": "^3.65.5",
     "@types/node": "^20",
     "@types/pg": "^8.21.0",
     "@types/react": "^19",

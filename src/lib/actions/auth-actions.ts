@@ -86,7 +86,7 @@ export async function loginAction(_prev: FormState, form: FormData): Promise<For
     await signIn("credentials", {
       identifier: identifier.value,
       password,
-      redirectTo: "/",
+      redirectTo: "/home",
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -115,7 +115,7 @@ export async function confirmAgeAction(
     data: { ageConfirmed: true, tosAcceptedAt: new Date() },
   });
 
-  redirect(account.profile ? "/" : "/onboarding");
+  redirect(account.profile ? "/home" : "/onboarding");
 }
 
 export async function oauthSignInAction(form: FormData) {

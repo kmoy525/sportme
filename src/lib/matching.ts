@@ -14,8 +14,7 @@ export type DeckCandidate = {
   bjj: {
     belt: string;
     gym: string | null;
-    weight: number | null;
-    heightIn: number | null;
+    weightClass: string | null;
   } | null;
   /** Server-side only — used for ordering, never serialized to the client. */
   distanceMiles: number;
@@ -94,7 +93,7 @@ export async function getCandidates(
     },
     select: {
       profileId: true,
-      bjj: { select: { belt: true, gym: true, weight: true, heightIn: true } },
+      bjj: { select: { belt: true, gym: true, weightClass: true } },
       profile: {
         select: {
           id: true,
@@ -126,8 +125,7 @@ export async function getCandidates(
         ? {
             belt: row.bjj.belt,
             gym: row.bjj.gym,
-            weight: row.bjj.weight,
-            heightIn: row.bjj.heightIn,
+            weightClass: row.bjj.weightClass,
           }
         : null,
       distanceMiles,
@@ -236,7 +234,7 @@ export async function resetPasses(profileId: string, sport: Sport): Promise<void
   await prisma.pass.deleteMany({ where: { fromProfileId: profileId, sport } });
 }
 
-/** Count for the Notifications tab badge. */
+/** Count for the Notifications page's "wants to train with you" list. */
 export async function pendingLikeCount(profileId: string): Promise<number> {
   const blocked = await blockedIds(profileId);
 

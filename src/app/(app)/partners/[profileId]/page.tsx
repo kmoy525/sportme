@@ -28,16 +28,16 @@ export default async function PartnerProfilePage({
 
   return (
     <>
-      <header className="bg-turf px-5 pb-5 pt-6">
+      <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
         <Link
           href="/notifications"
-          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-chalk/55 hover:text-chalk"
+          className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55 hover:text-ink"
         >
           ← Back
         </Link>
-        <h1 className="display mt-1.5 text-3xl text-chalk">{target.name}</h1>
+        <h1 className="display mt-1.5 text-3xl text-ink">{target.name}</h1>
         {target.isPartner ? (
-          <p className="stat mt-1 text-[11px] uppercase tracking-[0.12em] text-scoreboard">
+          <p className="stat mt-1 text-[11px] uppercase tracking-[0.12em] text-brand">
             Training Partner
           </p>
         ) : null}

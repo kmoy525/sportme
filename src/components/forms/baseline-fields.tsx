@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Field, inputClass } from "@/components/ui";
 import { TRAVEL_RADIUS_OPTIONS } from "@/lib/travel-radius";
-import { AGE_RANGE_OPTIONS, PREFERRED_CONTACT_OPTIONS } from "@/lib/enums";
+import { AGE_RANGE_OPTIONS } from "@/lib/enums";
 import type { FormState } from "@/lib/form";
 import { fieldError } from "@/lib/form";
 
@@ -13,7 +13,6 @@ export type BaselineDefaults = {
   ageRange?: string;
   zipCode?: string;
   travelRadiusMiles?: number;
-  preferredContact?: string;
   photoUrl?: string | null;
 };
 
@@ -83,7 +82,7 @@ export function BaselineFields({
           type="file"
           accept="image/jpeg,image/png,image/webp"
           disabled={!photoStorageConfigured}
-          className="w-full text-sm text-ink/70 file:mr-3 file:rounded-md file:border-0 file:bg-turf file:px-3 file:py-2 file:text-sm file:font-semibold file:text-chalk disabled:opacity-50"
+          className="w-full text-sm text-ink/70 file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink disabled:opacity-50"
         />
       </Field>
 
@@ -107,9 +106,9 @@ export function BaselineFields({
 
       <Field label="How far will you travel?" error={fieldError(state, "travelRadiusMiles")}>
         <input type="hidden" name="travelRadiusMiles" value={radius} />
-        <div className="rounded-md border border-turf/20 bg-white px-3 py-3">
+        <div className="rounded-2xl border border-ink/15 bg-white px-3 py-3">
           <div className="mb-2 flex items-baseline justify-between">
-            <span className="stat text-2xl font-semibold text-turf">{radius}</span>
+            <span className="stat text-2xl font-semibold text-ink">{radius}</span>
             <span className="stat text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/45">
               miles
             </span>
@@ -122,7 +121,7 @@ export function BaselineFields({
             value={radiusIndex}
             onChange={(e) => setRadiusIndex(Number(e.target.value))}
             aria-label="Travel radius in miles"
-            className="w-full accent-[#ff6b35]"
+            className="w-full accent-[#ff4754]"
           />
           <div className="mt-1 flex justify-between">
             {TRAVEL_RADIUS_OPTIONS.map((value) => (
@@ -132,24 +131,6 @@ export function BaselineFields({
             ))}
           </div>
         </div>
-      </Field>
-
-      <Field label="Preferred contact" error={fieldError(state, "preferredContact")}>
-        <select
-          name="preferredContact"
-          required
-          defaultValue={defaults.preferredContact ?? ""}
-          className={inputClass}
-        >
-          <option value="" disabled>
-            Select…
-          </option>
-          {PREFERRED_CONTACT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
       </Field>
     </>
   );

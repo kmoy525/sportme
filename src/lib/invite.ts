@@ -12,6 +12,6 @@ export function appUrl(): string {
   return "http://localhost:3000";
 }
 
-export function inviteMessageFor(sportLabel: string, zipCode: string): string {
-  return `Hey — found this app for finding ${sportLabel} partners near ${zipCode}. Check it out: ${appUrl()}`;
+export function inviteMessage(): string {
+  return `Hey! I found this app for finding people to do jiu jitsu with (and other sports). Check it out: ${appUrl()}`;
 }

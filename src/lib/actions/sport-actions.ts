@@ -4,14 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { prisma } from "../db";
-import { isBelt } from "../enums";
-import { int, str, type FormState } from "../form";
+import { isBelt, isWeightClass } from "../enums";
+import { str, type FormState } from "../form";
 import { requireProfile } from "../session";
-import { parseSport, SPORT_META, type SportSlug } from "../sports";
+import { parseSport } from "../sports";
 
 /**
- * Opt into matching for a sport, capturing its sport-specific fields.
- * Jiu-jitsu is the only sport with sport-specific fields in MVP.
+ * Opt into matching for jiu-jitsu, capturing its sport-specific fields.
+ * The only sport with sport-specific fields — see optInGenericSportAction
+ * for every other sport.
  */
 export async function optInSportAction(
   _prev: FormState,
@@ -20,33 +21,22 @@ export async function optInSportAction(
   const { profile } = await requireProfile();
 
   const sport = parseSport(str(form, "sport"));
-  if (!sport) return { error: "Unknown sport." };
-  if (!SPORT_META[sport as SportSlug].matchingEnabled) {
-    return { error: "Finding a partner isn't available for this sport yet." };
-  }
+  if (sport !== "bjj") return { error: "Unknown sport." };
 
   const beltRaw = str(form, "belt");
   const gym = str(form, "gym");
-  const weight = int(form, "weight");
-  const heightFeet = int(form, "heightFeet");
-  const heightInches = int(form, "heightInches");
+  const weightClassRaw = str(form, "weightClass");
 
   const fieldErrors: Record<string, string> = {};
   const belt = isBelt(beltRaw) ? beltRaw : null;
   if (!belt) fieldErrors.belt = "Pick your belt.";
-  if (weight !== null && (weight < 60 || weight > 600)) {
-    fieldErrors.weight = "Enter a weight between 60 and 600 lb.";
-  }
-  if (heightFeet !== null && (heightFeet < 3 || heightFeet > 8)) {
-    fieldErrors.height = "Enter a height between 3 and 8 feet.";
-  }
-  if (heightInches !== null && (heightInches < 0 || heightInches > 11)) {
-    fieldErrors.height = "Inches must be between 0 and 11.";
-  }
+  const weightClass = weightClassRaw
+    ? isWeightClass(weightClassRaw)
+      ? weightClassRaw
+      : null
+    : null;
+  if (weightClassRaw && !weightClass) fieldErrors.weightClass = "Pick a weight class.";
   if (!belt || Object.keys(fieldErrors).length > 0) return { fieldErrors };
-
-  const heightIn =
-    heightFeet === null ? null : heightFeet * 12 + (heightInches ?? 0);
 
   const sportProfile = await prisma.sportProfile.upsert({
     where: { profileId_sport: { profileId: profile.id, sport } },
@@ -57,8 +47,28 @@ export async function optInSportAction(
 
   await prisma.sportProfileBjj.upsert({
     where: { sportProfileId: sportProfile.id },
-    update: { belt, gym: gym || null, weight, heightIn },
-    create: { sportProfileId: sportProfile.id, belt, gym: gym || null, weight, heightIn },
+    update: { belt, gym: gym || null, weightClass },
+    create: { sportProfileId: sportProfile.id, belt, gym: gym || null, weightClass },
+  });
+
+  revalidatePath(`/sports/${sport}`);
+  revalidatePath("/profile");
+  redirect(`/sports/${sport}`);
+}
+
+/**
+ * Opt into matching for sports with no sport-specific fields (running,
+ * tennis, lifting) — just flips optedIntoMatching on, nothing else to fill in.
+ */
+export async function optInGenericSportAction(form: FormData) {
+  const { profile } = await requireProfile();
+  const sport = parseSport(str(form, "sport"));
+  if (!sport || sport === "bjj") return;
+
+  await prisma.sportProfile.upsert({
+    where: { profileId_sport: { profileId: profile.id, sport } },
+    update: { optedIntoMatching: true },
+    create: { profileId: profile.id, sport, optedIntoMatching: true },
   });
 
   revalidatePath(`/sports/${sport}`);
@@ -83,7 +93,7 @@ export async function setMatchingOptInAction(form: FormData) {
   revalidatePath("/profile");
 }
 
-/** Join a sport without opting into matching (running/tennis/lifting in MVP). */
+/** Join a sport without opting into matching. */
 export async function joinSportAction(form: FormData) {
   const { profile } = await requireProfile();
   const sport = parseSport(str(form, "sport"));

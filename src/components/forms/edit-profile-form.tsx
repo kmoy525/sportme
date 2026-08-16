@@ -23,7 +23,7 @@ export function EditProfileForm({
     <form action={action} className="space-y-5">
       <FormError>{state.error}</FormError>
       {saved ? (
-        <p className="rounded-md border border-turf/25 bg-turf/5 px-3 py-2 text-sm font-medium text-turf">
+        <p className="rounded-2xl border border-ink/15 bg-ink/5 px-3 py-2 text-sm font-medium text-ink">
           Saved.
         </p>
       ) : null}

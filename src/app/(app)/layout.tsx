@@ -1,5 +1,5 @@
 import { BottomNav } from "@/components/bottom-nav";
-import { pendingLikeCount } from "@/lib/matching";
+import { hasUnreadNotifications } from "@/lib/notifications";
 import { requireProfile } from "@/lib/session";
 
 /**
@@ -12,14 +12,14 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const { profile } = await requireProfile();
-  const notificationCount = await pendingLikeCount(profile.id);
+  const hasNotificationBadge = await hasUnreadNotifications(profile.id);
 
   return (
-    <div className="min-h-dvh bg-chalk">
+    <div className="min-h-dvh bg-white">
       <div className="mx-auto min-h-dvh max-w-md pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
         {children}
       </div>
-      <BottomNav notificationCount={notificationCount} />
+      <BottomNav hasNotificationBadge={hasNotificationBadge} />
     </div>
   );
 }

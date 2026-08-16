@@ -1,5 +1,4 @@
-// TrainWithMe — data model
-// See docs/DATA_MODEL.md for the mapping back to the product spec.
+// SportMe — data model
 
 generator client {
   provider = "prisma-client"
@@ -35,11 +34,6 @@ enum Belt {
   black
 }
 
-enum PreferredContact {
-  email
-  sms
-}
-
 enum AuthProvider {
   credentials
   google
@@ -51,6 +45,19 @@ enum ReportReason {
   harassment
   inappropriate_photo
   other
+}
+
+/// Standard BJJ weight classes, rooster to ultra heavy.
+enum WeightClass {
+  rooster
+  light_feather
+  feather
+  light
+  middle
+  medium_heavy
+  heavy
+  super_heavy
+  ultra_heavy
 }
 
 // ---------------------------------------------------------------- auth
@@ -75,22 +82,23 @@ model Account {
 
 /// Baseline, sport-agnostic info. Created during onboarding.
 model Profile {
-  id                String           @id @default(cuid())
-  accountId         String           @unique @map("account_id")
-  name              String
-  ageRange          AgeRange         @map("age_range")
-  photoUrl          String?          @map("photo_url")
-  zipCode           String           @map("zip_code")
+  id                    String    @id @default(cuid())
+  accountId             String    @unique @map("account_id")
+  name                  String
+  ageRange              AgeRange  @map("age_range")
+  photoUrl              String?   @map("photo_url")
+  zipCode               String    @map("zip_code")
   /// Geocoded server-side from zipCode. NEVER serialized to the client.
-  lat               Float
+  lat                   Float
   /// Geocoded server-side from zipCode. NEVER serialized to the client.
-  lng               Float
-  travelRadiusMiles Int              @default(25) @map("travel_radius_miles")
-  preferredContact  PreferredContact @map("preferred_contact")
+  lng                   Float
+  travelRadiusMiles     Int       @default(25) @map("travel_radius_miles")
   /// Set true by the report auto-hide threshold. Pending manual review; never deleted.
-  hidden            Boolean          @default(false)
-  createdAt         DateTime         @default(now()) @map("created_at")
-  updatedAt         DateTime         @updatedAt @map("updated_at")
+  hidden                Boolean   @default(false)
+  /// Bumped when the Notifications tab is opened — clears the "unread like" nav badge.
+  notificationsViewedAt DateTime? @map("notifications_viewed_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
@@ -106,6 +114,7 @@ model Profile {
   reportsMade     Report[]       @relation("Reporter")
   reportsAgainst  Report[]       @relation("Reported")
   messages        Message[]
+  chatReads       ChatRead[]
   eventsSubmitted Event[]
   sportRequests   SportRequest[]
 
@@ -132,9 +141,8 @@ model SportProfile {
 
 /// Sport-specific fields for jiu-jitsu. The only sport-specific table in MVP.
 model SportProfileBjj {
-  sportProfileId String  @id @map("sport_profile_id")
-  weight         Int?
-  heightIn       Int?    @map("height_in")
+  sportProfileId String       @id @map("sport_profile_id")
+  weightClass    WeightClass? @map("weight_class")
   belt           Belt
   /// "N/A" is an allowed value.
   gym            String?
@@ -183,11 +191,11 @@ model Pass {
 /// profileAId is always the lexicographically smaller id, so the unique
 /// constraint genuinely dedupes a pair.
 model Match {
-  id        String   @id @default(cuid())
-  profileAId String  @map("profile_a_id")
-  profileBId String  @map("profile_b_id")
-  sport     Sport
-  createdAt DateTime @default(now()) @map("created_at")
+  id         String   @id @default(cuid())
+  profileAId String   @map("profile_a_id")
+  profileBId String   @map("profile_b_id")
+  sport      Sport
+  createdAt  DateTime @default(now()) @map("created_at")
 
   profileA Profile @relation("MatchA", fields: [profileAId], references: [id], onDelete: Cascade)
   profileB Profile @relation("MatchB", fields: [profileBId], references: [id], onDelete: Cascade)
@@ -238,8 +246,9 @@ model Chat {
   matchId   String   @unique @map("match_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  match    Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  match    Match      @relation(fields: [matchId], references: [id], onDelete: Cascade)
   messages Message[]
+  reads    ChatRead[]
 
   @@map("chats")
 }
@@ -258,6 +267,21 @@ model Message {
   @@map("messages")
 }
 
+/// Tracks when each side of a chat last read it — drives the Notifications
+/// nav badge's "unread message" state. One row per (chat, profile).
+model ChatRead {
+  id         String   @id @default(cuid())
+  chatId     String   @map("chat_id")
+  profileId  String   @map("profile_id")
+  lastReadAt DateTime @default(now()) @map("last_read_at")
+
+  chat    Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, profileId])
+  @@map("chat_reads")
+}
+
 // ---------------------------------------------------------------- events
 
 /// Fed by two sources: admin-curated (createdByProfileId null) and member-submitted.
@@ -265,6 +289,7 @@ model Event {
   id                 String   @id @default(cuid())
   sport              Sport
   name               String
+  description        String?
   locationText       String   @map("location_text")
   zipCode            String   @map("zip_code")
   lat                Float

@@ -69,7 +69,7 @@ export function RespondToLike({
           onClick={() => respond(false)}
           disabled={pending}
           aria-label="Pass"
-          className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-turf/20 bg-white text-turf/60 transition-colors hover:border-turf/40 hover:text-turf active:scale-95 disabled:opacity-50"
+          className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ink/20 bg-white text-ink/60 transition-colors hover:border-ink/40 hover:text-ink active:scale-95 disabled:opacity-50"
         >
           <ThumbDownIcon className="h-7 w-7" />
         </button>
@@ -78,7 +78,7 @@ export function RespondToLike({
           onClick={() => respond(true)}
           disabled={pending}
           aria-label="Train with them"
-          className="flex h-20 w-20 items-center justify-center rounded-full bg-cone text-white shadow-[0_4px_0_rgba(20,20,20,0.15)] transition-transform hover:bg-cone/90 active:scale-95 disabled:opacity-50"
+          className="flex h-20 w-20 items-center justify-center rounded-full bg-brand text-white shadow-[0_4px_0_rgba(20,20,20,0.15)] transition-transform hover:bg-brand/90 active:scale-95 disabled:opacity-50"
         >
           <ThumbUpIcon className="h-9 w-9" />
         </button>

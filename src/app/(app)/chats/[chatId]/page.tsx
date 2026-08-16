@@ -5,6 +5,7 @@ import { ChatThread } from "@/components/chat-thread";
 import { FlagIcon } from "@/components/icons";
 import { ProfilePhoto } from "@/components/profile-card";
 import { prisma } from "@/lib/db";
+import { markChatRead } from "@/lib/notifications";
 import { requireProfile } from "@/lib/session";
 import { isBlockedBetween } from "@/lib/visibility";
 
@@ -66,13 +67,16 @@ export default async function ChatPage({
     select: { sport: true },
   });
 
+  // Clears this chat's half of the Notifications nav badge.
+  await markChatRead(chat.id, profile.id);
+
   return (
     <>
-      <header className="sticky top-0 z-30 flex items-center gap-3 bg-turf px-5 py-3">
+      <header className="sticky top-0 z-30 flex items-center gap-3 bg-white px-5 py-3">
         <Link
           href="/notifications"
           aria-label="Back"
-          className="stat shrink-0 text-lg text-chalk/60 hover:text-chalk"
+          className="stat shrink-0 text-lg text-ink/60 hover:text-ink"
         >
           ←
         </Link>
@@ -83,10 +87,10 @@ export default async function ChatPage({
         >
           <ProfilePhoto photoUrl={partner.photoUrl} name={partner.name} size="sm" />
           <span className="min-w-0">
-            <span className="display block truncate text-xl text-chalk">
+            <span className="display block truncate text-xl text-ink">
               {partner.name}
             </span>
-            <span className="stat block text-[10px] uppercase tracking-[0.12em] text-scoreboard">
+            <span className="stat block text-[10px] uppercase tracking-[0.12em] text-brand">
               Training Partner
             </span>
           </span>
@@ -97,7 +101,7 @@ export default async function ChatPage({
           href={`/report/${partner.id}`}
           aria-label={`Report or block ${partner.name}`}
           title="Report or block"
-          className="shrink-0 rounded p-1.5 text-chalk/45 transition-colors hover:bg-white/10 hover:text-chalk"
+          className="shrink-0 rounded p-1.5 text-ink/45 transition-colors hover:bg-ink/5 hover:text-ink"
         >
           <FlagIcon className="h-4 w-4" />
         </Link>

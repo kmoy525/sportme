@@ -11,8 +11,7 @@ export type VisibleSportProfile = {
   bjj: {
     belt: string;
     gym: string | null;
-    weight: number | null;
-    heightIn: number | null;
+    weightClass: string | null;
   } | null;
 };
 
@@ -51,7 +50,7 @@ export async function getVisibleProfile(
         where: { optedIntoMatching: true },
         select: {
           sport: true,
-          bjj: { select: { belt: true, gym: true, weight: true, heightIn: true } },
+          bjj: { select: { belt: true, gym: true, weightClass: true } },
         },
       },
     },

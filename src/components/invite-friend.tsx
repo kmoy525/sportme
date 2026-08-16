@@ -21,10 +21,10 @@ export function InviteFriendLink({ message }: { message: string }) {
   return (
     <a
       href={sms}
-      className="flex items-center justify-between rounded-card border border-dashed border-turf/30 bg-white px-4 py-3.5 text-sm font-semibold text-turf transition-colors hover:border-turf/60 hover:bg-turf/5"
+      className="flex items-center justify-between rounded-card border border-dashed border-ink/30 bg-white px-4 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-ink/60 hover:bg-ink/5"
     >
       Know someone who trains? Invite a friend
-      <span aria-hidden className="text-cone">
+      <span aria-hidden className="text-brand">
         →
       </span>
     </a>

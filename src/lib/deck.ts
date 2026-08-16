@@ -13,8 +13,7 @@ export type DeckProfile = {
   bjj: {
     belt: string;
     gym: string | null;
-    weight: number | null;
-    heightIn: number | null;
+    weightClass: string | null;
   } | null;
 };
 

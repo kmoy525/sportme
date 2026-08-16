@@ -17,7 +17,8 @@ export default auth((req) => {
   const isAuthed = Boolean(req.auth?.accountId);
 
   const publicPaths = ["/login", "/signup", "/terms", "/api/auth"];
-  const isPublic = publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const isPublic =
+    pathname === "/" || publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
   if (!isAuthed && !isPublic && !pathname.startsWith("/admin")) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
