@@ -60,6 +60,66 @@ enum WeightClass {
   ultra_heavy
 }
 
+enum RunningRaceDistance {
+  five_k
+  ten_k
+  half_marathon
+  marathon
+  ultra_marathon
+}
+
+enum RunningTypicalDistance {
+  one_mile
+  five_k
+  ten_k
+  ten_miles_plus
+}
+
+enum TennisStyle {
+  competitive
+  social
+}
+
+enum TennisPreference {
+  singles
+  doubles
+  both
+}
+
+enum LiftingProgram {
+  general_strength
+  powerlifting
+  bodybuilding
+  calisthenics
+  crossfit
+}
+
+enum LiftingGoal {
+  strength
+  fat_loss
+  competition_prep
+  general_fitness
+}
+
+enum SessionLength {
+  min_20
+  min_30
+  min_45
+  hr_1
+  hr_1_5
+  hr_2_plus
+}
+
+enum GymMembership {
+  twenty_four_hour_fitness
+  planet_fitness
+  ymca
+  healthworks
+  equinox
+  lifetime
+  other
+}
+
 // ---------------------------------------------------------------- auth
 
 /// Created at signup, before onboarding.
@@ -128,18 +188,23 @@ model SportProfile {
   profileId         String   @map("profile_id")
   sport             Sport
   optedIntoMatching Boolean  @default(false) @map("opted_into_matching")
+  /// Free-text blurb shown on the profile card, same field across every sport.
+  description       String?
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
-  profile Profile          @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile Profile              @relation(fields: [profileId], references: [id], onDelete: Cascade)
   bjj     SportProfileBjj?
+  running SportProfileRunning?
+  tennis  SportProfileTennis?
+  lifting SportProfileLifting?
 
   @@unique([profileId, sport])
   @@index([sport, optedIntoMatching])
   @@map("sport_profiles")
 }
 
-/// Sport-specific fields for jiu-jitsu. The only sport-specific table in MVP.
+/// Sport-specific fields for jiu-jitsu.
 model SportProfileBjj {
   sportProfileId String       @id @map("sport_profile_id")
   weightClass    WeightClass? @map("weight_class")
@@ -150,6 +215,45 @@ model SportProfileBjj {
   sportProfile SportProfile @relation(fields: [sportProfileId], references: [id], onDelete: Cascade)
 
   @@map("sport_profile_bjj")
+}
+
+/// Sport-specific fields for running.
+model SportProfileRunning {
+  sportProfileId     String                  @id @map("sport_profile_id")
+  /// Seconds per mile, e.g. 510 = 8:30/mi. Always a multiple of 30.
+  paceSecondsPerMile Int?                    @map("pace_seconds_per_mile")
+  trainingFor        RunningRaceDistance?    @map("training_for")
+  typicalDistance    RunningTypicalDistance? @map("typical_distance")
+
+  sportProfile SportProfile @relation(fields: [sportProfileId], references: [id], onDelete: Cascade)
+
+  @@map("sport_profile_running")
+}
+
+/// Sport-specific fields for tennis.
+model SportProfileTennis {
+  sportProfileId String            @id @map("sport_profile_id")
+  /// NTRP rating, 1.0-7.0 in 0.5 steps.
+  ntrp           Float?
+  style          TennisStyle?
+  preference     TennisPreference?
+
+  sportProfile SportProfile @relation(fields: [sportProfileId], references: [id], onDelete: Cascade)
+
+  @@map("sport_profile_tennis")
+}
+
+/// Sport-specific fields for lifting.
+model SportProfileLifting {
+  sportProfileId String          @id @map("sport_profile_id")
+  program        LiftingProgram?
+  goal           LiftingGoal?
+  sessionLength  SessionLength?  @map("session_length")
+  gymMembership  GymMembership?  @map("gym_membership")
+
+  sportProfile SportProfile @relation(fields: [sportProfileId], references: [id], onDelete: Cascade)
+
+  @@map("sport_profile_lifting")
 }
 
 // ---------------------------------------------------------------- matching

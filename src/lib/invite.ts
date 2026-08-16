@@ -12,6 +12,7 @@ export function appUrl(): string {
   return "http://localhost:3000";
 }
 
-export function inviteMessage(): string {
-  return `Hey! I found this app for finding people to do jiu jitsu with (and other sports). Check it out: ${appUrl()}`;
+/** @param sportLabel Lowercase, mid-sentence form — e.g. "running", "jiu jitsu". */
+export function inviteMessage(sportLabel: string): string {
+  return `Hey! I found this app for finding people to do ${sportLabel} with (and other sports). Check it out: ${appUrl()}`;
 }

@@ -6,16 +6,30 @@ import { prisma } from "./db";
 import { boundingBox, milesBetween } from "./distance";
 import { blockedIds } from "./visibility";
 
+export type BjjStats = { belt: string; gym: string | null; weightClass: string | null };
+export type RunningStats = {
+  paceSecondsPerMile: number | null;
+  trainingFor: string | null;
+  typicalDistance: string | null;
+};
+export type TennisStats = { ntrp: number | null; style: string | null; preference: string | null };
+export type LiftingStats = {
+  program: string | null;
+  goal: string | null;
+  sessionLength: string | null;
+  gymMembership: string | null;
+};
+
 export type DeckCandidate = {
   profileId: string;
   name: string;
   ageRange: string;
   photoUrl: string | null;
-  bjj: {
-    belt: string;
-    gym: string | null;
-    weightClass: string | null;
-  } | null;
+  description: string | null;
+  bjj: BjjStats | null;
+  running: RunningStats | null;
+  tennis: TennisStats | null;
+  lifting: LiftingStats | null;
   /** Server-side only — used for ordering, never serialized to the client. */
   distanceMiles: number;
   /** True when this person already thumbs-upped the viewer. */
@@ -93,7 +107,11 @@ export async function getCandidates(
     },
     select: {
       profileId: true,
+      description: true,
       bjj: { select: { belt: true, gym: true, weightClass: true } },
+      running: { select: { paceSecondsPerMile: true, trainingFor: true, typicalDistance: true } },
+      tennis: { select: { ntrp: true, style: true, preference: true } },
+      lifting: { select: { program: true, goal: true, sessionLength: true, gymMembership: true } },
       profile: {
         select: {
           id: true,
@@ -121,13 +139,11 @@ export async function getCandidates(
       name: row.profile.name,
       ageRange: row.profile.ageRange,
       photoUrl: row.profile.photoUrl,
-      bjj: row.bjj
-        ? {
-            belt: row.bjj.belt,
-            gym: row.bjj.gym,
-            weightClass: row.bjj.weightClass,
-          }
-        : null,
+      description: row.description,
+      bjj: row.bjj,
+      running: row.running,
+      tennis: row.tennis,
+      lifting: row.lifting,
       distanceMiles,
       likesViewer: likedViewer.has(row.profile.id),
     });

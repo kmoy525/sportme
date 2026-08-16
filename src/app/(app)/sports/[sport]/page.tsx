@@ -58,7 +58,7 @@ export default async function SportPage({
     }),
   ]);
 
-  const invite = inviteMessage();
+  const invite = inviteMessage(meta.lowerLabel);
 
   return (
     <>

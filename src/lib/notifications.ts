@@ -178,34 +178,44 @@ const EPOCH = new Date(0);
 
 /**
  * Whether the Notifications nav icon should show its unread dot: any pending
- * like received since the tab was last opened, or any chat message from the
- * other side since that chat was last opened.
+ * (not-yet-reciprocated) like received since the tab was last opened, or any
+ * chat message from the other side since that chat was last opened.
  */
 export async function hasUnreadNotifications(profileId: string): Promise<boolean> {
-  const [profile, blocked] = await Promise.all([
+  const [profile, blocked, reciprocated] = await Promise.all([
     prisma.profile.findUnique({
       where: { id: profileId },
       select: { notificationsViewedAt: true },
     }),
     blockedIds(profileId),
+    // Likes I've already sent back — once mutual, it's a match, not a
+    // pending "wants to train with you" notification.
+    prisma.like.findMany({
+      where: { fromProfileId: profileId },
+      select: { toProfileId: true, sport: true },
+    }),
   ]);
   const viewedAt = profile?.notificationsViewedAt ?? EPOCH;
+  const reciprocatedKeys = new Set(reciprocated.map((l) => `${l.toProfileId}:${l.sport}`));
 
-  const [unreadLike, chatIds] = await Promise.all([
-    prisma.like.findFirst({
+  const [likesReceived, chatIds] = await Promise.all([
+    prisma.like.findMany({
       where: {
         toProfileId: profileId,
         createdAt: { gt: viewedAt },
         fromProfileId: blocked.length ? { notIn: blocked } : undefined,
         fromProfile: { hidden: false },
       },
-      select: { id: true },
+      select: { fromProfileId: true, sport: true },
     }),
     prisma.chat.findMany({
       where: { match: { OR: [{ profileAId: profileId }, { profileBId: profileId }] } },
       select: { id: true },
     }),
   ]);
+  const unreadLike = likesReceived.some(
+    (l) => !reciprocatedKeys.has(`${l.fromProfileId}:${l.sport}`),
+  );
   if (unreadLike) return true;
   if (chatIds.length === 0) return false;
 

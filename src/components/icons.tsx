@@ -89,3 +89,63 @@ export function FlagIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+/** Variety of shapes — "any sport, big or small". */
+export function ShapesIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className}
+    >
+      <circle cx="7" cy="7" r="4.5" />
+      <rect x="13" y="2.5" width="9" height="9" rx="1.5" />
+      <path d="M8 21.5h9L12.5 13Z" />
+    </svg>
+  );
+}
+
+/** Two people — "find a partner or a whole group". */
+export function PeopleIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className}
+    >
+      <circle cx="9" cy="7" r="3.25" />
+      <path d="M2.5 20.5c0-3.6 2.9-6.25 6.5-6.25s6.5 2.65 6.5 6.25" />
+      <circle cx="17.5" cy="8" r="2.5" />
+      <path d="M16 14.75c2.75.5 4.5 2.75 4.5 5.75" />
+    </svg>
+  );
+}
+
+/** Map pin — "wherever you're starting from". */
+export function MapPinIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className}
+    >
+      <path d="M12 21.5S4.5 14.9 4.5 9.5a7.5 7.5 0 0 1 15 0c0 5.4-7.5 12-7.5 12Z" />
+      <circle cx="12" cy="9.5" r="2.75" />
+    </svg>
+  );
+}

@@ -3,16 +3,17 @@ import "server-only";
 import type { Sport } from "@/generated/prisma/enums";
 
 import { prisma } from "./db";
+import type { BjjStats, LiftingStats, RunningStats, TennisStats } from "./matching";
 import { arePartners } from "./notifications";
 import { isBlockedBetween } from "./visibility";
 
 export type VisibleSportProfile = {
   sport: Sport;
-  bjj: {
-    belt: string;
-    gym: string | null;
-    weightClass: string | null;
-  } | null;
+  description: string | null;
+  bjj: BjjStats | null;
+  running: RunningStats | null;
+  tennis: TennisStats | null;
+  lifting: LiftingStats | null;
 };
 
 export type VisibleProfile = {
@@ -50,7 +51,15 @@ export async function getVisibleProfile(
         where: { optedIntoMatching: true },
         select: {
           sport: true,
+          description: true,
           bjj: { select: { belt: true, gym: true, weightClass: true } },
+          running: {
+            select: { paceSecondsPerMile: true, trainingFor: true, typicalDistance: true },
+          },
+          tennis: { select: { ntrp: true, style: true, preference: true } },
+          lifting: {
+            select: { program: true, goal: true, sessionLength: true, gymMembership: true },
+          },
         },
       },
     },

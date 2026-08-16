@@ -7,11 +7,13 @@ import { Field, FormError, inputClass } from "@/components/ui";
 import { optInSportAction } from "@/lib/actions/sport-actions";
 import { BELT_OPTIONS, WEIGHT_CLASS_OPTIONS } from "@/lib/enums";
 import { emptyFormState, fieldError } from "@/lib/form";
+import { SPORT_META } from "@/lib/sports";
 
 export type BjjDefaults = {
   belt?: string;
   gym?: string | null;
   weightClass?: string | null;
+  description?: string | null;
 };
 
 export function BjjFieldsForm({
@@ -86,6 +88,17 @@ export function BjjFieldsForm({
             </option>
           ))}
         </select>
+      </Field>
+
+      <Field label="About you" hint="Optional. Shown on your profile.">
+        <textarea
+          name="description"
+          rows={4}
+          maxLength={500}
+          defaultValue={defaults.description ?? ""}
+          placeholder={SPORT_META.bjj.descriptionPlaceholder}
+          className={inputClass}
+        />
       </Field>
 
       <SubmitButton size="lg" pendingLabel="Saving…">

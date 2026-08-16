@@ -18,6 +18,8 @@ type SportMeta = {
    * homepage sport card, and the sport page header.
    */
   imageUrl: string;
+  /** Sample text shown as the opt-in description field's placeholder. */
+  descriptionPlaceholder: string;
   /** Extra strings the homepage search should match on. */
   searchTerms: string[];
 };
@@ -30,6 +32,8 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1585537884613-1a9bcd024983?auto=format&fit=crop&w=1200&q=80",
+    descriptionPlaceholder:
+      "Just moved to US and want to find people to do bjj with. LMK if you're interested!",
     searchTerms: [
       "bjj",
       "jiu-jitsu",
@@ -51,6 +55,8 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&w=1200&q=80",
+    descriptionPlaceholder:
+      "Looking for a running buddy! Training for my first 5K and would like someone to chat with as we train.",
     searchTerms: ["run", "running", "jog", "jogging", "5k", "10k", "marathon", "track"],
   },
   tennis: {
@@ -60,6 +66,8 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1548920168-70d61248a912?auto=format&fit=crop&w=1200&q=80",
+    descriptionPlaceholder:
+      "Looking to start playing tennis again. Played in high school and want a buddy to get me back into it.",
     searchTerms: ["tennis", "singles", "doubles", "racquet", "racket"],
   },
   lifting: {
@@ -69,6 +77,8 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",
+    descriptionPlaceholder:
+      "Let's lift together! I just finished personal training sessions in India and would like to help someone train.",
     searchTerms: [
       "lift",
       "lifting",

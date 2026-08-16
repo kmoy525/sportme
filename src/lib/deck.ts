@@ -1,4 +1,10 @@
-import type { DeckCandidate } from "./matching";
+import type {
+  BjjStats,
+  DeckCandidate,
+  LiftingStats,
+  RunningStats,
+  TennisStats,
+} from "./matching";
 
 /**
  * What the client is allowed to see about a candidate.
@@ -10,11 +16,11 @@ export type DeckProfile = {
   name: string;
   ageRange: string;
   photoUrl: string | null;
-  bjj: {
-    belt: string;
-    gym: string | null;
-    weightClass: string | null;
-  } | null;
+  description: string | null;
+  bjj: BjjStats | null;
+  running: RunningStats | null;
+  tennis: TennisStats | null;
+  lifting: LiftingStats | null;
 };
 
 export function toDeckProfile(candidate: DeckCandidate): DeckProfile {
@@ -23,6 +29,10 @@ export function toDeckProfile(candidate: DeckCandidate): DeckProfile {
     name: candidate.name,
     ageRange: candidate.ageRange,
     photoUrl: candidate.photoUrl,
+    description: candidate.description,
     bjj: candidate.bjj,
+    running: candidate.running,
+    tennis: candidate.tennis,
+    lifting: candidate.lifting,
   };
 }

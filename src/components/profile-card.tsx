@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 import type { DeckProfile } from "@/lib/deck";
-import { ageRangeLabel, beltLabel, beltSwatch, weightClassLabel } from "@/lib/enums";
+import { ageRangeLabel } from "@/lib/enums";
 
 import { FlagIcon } from "./icons";
-import { Badge, Card, Stat } from "./ui";
+import { SportStats } from "./sport-stats";
+import { Card } from "./ui";
 
 /**
  * Small, corner-anchored photo — deliberately not full-bleed, to keep this
@@ -51,6 +52,8 @@ export function ProfileCard({
   profile: DeckProfile;
   footer?: React.ReactNode;
 }) {
+  const hasStats = profile.bjj || profile.running || profile.tennis || profile.lifting;
+
   return (
     <Card className="overflow-hidden">
       <div className="flex items-start gap-3 border-b border-ink/10 px-4 py-4">
@@ -71,24 +74,9 @@ export function ProfileCard({
         </Link>
       </div>
 
-      {profile.bjj ? (
+      {hasStats || profile.description ? (
         <div className="bg-ink/[0.03] px-4 py-3">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-            <div className="flex items-center gap-2">
-              <span
-                aria-hidden
-                className="h-4 w-4 rounded-full border border-ink/20"
-                style={{ background: beltSwatch(profile.bjj.belt) }}
-              />
-              <Stat label="Belt" value={beltLabel(profile.bjj.belt)} />
-            </div>
-            <Stat label="Gym" value={profile.bjj.gym || "—"} />
-          </div>
-          {profile.bjj.weightClass ? (
-            <div className="mt-3">
-              <Badge tone="muted">{weightClassLabel(profile.bjj.weightClass)}</Badge>
-            </div>
-          ) : null}
+          <SportStats data={profile} />
         </div>
       ) : null}
 

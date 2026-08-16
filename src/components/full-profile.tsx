@@ -1,12 +1,13 @@
 import Link from "next/link";
 
 import type { VisibleProfile } from "@/lib/profiles";
-import { ageRangeLabel, beltLabel, beltSwatch, weightClassLabel } from "@/lib/enums";
+import { ageRangeLabel } from "@/lib/enums";
 import { sportLabel } from "@/lib/sports";
 
 import { FlagIcon } from "./icons";
 import { ProfilePhoto } from "./profile-card";
-import { Badge, Card, Stat } from "./ui";
+import { SportStats } from "./sport-stats";
+import { Card } from "./ui";
 
 export function FullProfile({ profile }: { profile: VisibleProfile }) {
   return (
@@ -21,36 +22,24 @@ export function FullProfile({ profile }: { profile: VisibleProfile }) {
         </div>
       </Card>
 
-      {profile.sportProfiles.map((sp) => (
-        <Card key={sp.sport} className="px-4 py-4">
-          <h3 className="stat mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink">
-            {sportLabel(sp.sport)}
-          </h3>
+      {profile.sportProfiles.map((sp) => {
+        const hasStats = sp.bjj || sp.running || sp.tennis || sp.lifting;
+        return (
+          <Card key={sp.sport} className="px-4 py-4">
+            <h3 className="stat mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink">
+              {sportLabel(sp.sport)}
+            </h3>
 
-          {sp.bjj ? (
-            <>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                <div className="flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="h-4 w-4 rounded-full border border-ink/20"
-                    style={{ background: beltSwatch(sp.bjj.belt) }}
-                  />
-                  <Stat label="Belt" value={beltLabel(sp.bjj.belt)} />
-                </div>
-                <Stat label="Gym" value={sp.bjj.gym || "—"} />
-              </div>
-              {sp.bjj.weightClass ? (
-                <div className="mt-3">
-                  <Badge tone="muted">{weightClassLabel(sp.bjj.weightClass)}</Badge>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <p className="text-sm text-ink/55">Training {sportLabel(sp.sport).toLowerCase()}.</p>
-          )}
-        </Card>
-      ))}
+            {hasStats || sp.description ? (
+              <SportStats data={sp} />
+            ) : (
+              <p className="text-sm text-ink/55">
+                Training {sportLabel(sp.sport).toLowerCase()}.
+              </p>
+            )}
+          </Card>
+        );
+      })}
 
       {/* Report must be reachable from anywhere a profile is visible. */}
       <div className="flex items-center justify-center gap-4 pt-1">

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BjjFieldsForm } from "@/components/forms/bjj-fields-form";
+import { LiftingFieldsForm } from "@/components/forms/lifting-fields-form";
+import { RunningFieldsForm } from "@/components/forms/running-fields-form";
+import { TennisFieldsForm } from "@/components/forms/tennis-fields-form";
 import { ButtonLink, Card } from "@/components/ui";
 import { setMatchingOptInAction } from "@/lib/actions/sport-actions";
 import { prisma } from "@/lib/db";
@@ -21,7 +24,14 @@ export default async function ManageSportPage({
 
   const sportProfile = await prisma.sportProfile.findUnique({
     where: { profileId_sport: { profileId: profile.id, sport } },
-    select: { optedIntoMatching: true, bjj: true },
+    select: {
+      optedIntoMatching: true,
+      description: true,
+      bjj: true,
+      running: true,
+      tennis: true,
+      lifting: true,
+    },
   });
 
   return (
@@ -84,16 +94,31 @@ export default async function ManageSportPage({
               </form>
             </Card>
 
-            {sport === "bjj" ? (
-              <div>
-                <h2 className="display mb-3 text-xl text-ink">Your details</h2>
+            <div>
+              <h2 className="display mb-3 text-xl text-ink">Your details</h2>
+              {sport === "bjj" ? (
                 <BjjFieldsForm
                   sport={sport}
-                  defaults={sportProfile.bjj ?? undefined}
+                  defaults={{ ...sportProfile.bjj, description: sportProfile.description }}
                   submitLabel="Save changes"
                 />
-              </div>
-            ) : null}
+              ) : sport === "running" ? (
+                <RunningFieldsForm
+                  defaults={{ ...sportProfile.running, description: sportProfile.description }}
+                  submitLabel="Save changes"
+                />
+              ) : sport === "tennis" ? (
+                <TennisFieldsForm
+                  defaults={{ ...sportProfile.tennis, description: sportProfile.description }}
+                  submitLabel="Save changes"
+                />
+              ) : (
+                <LiftingFieldsForm
+                  defaults={{ ...sportProfile.lifting, description: sportProfile.description }}
+                  submitLabel="Save changes"
+                />
+              )}
+            </div>
           </>
         )}
       </main>

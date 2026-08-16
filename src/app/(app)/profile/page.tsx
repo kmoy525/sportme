@@ -48,35 +48,53 @@ export default async function ProfilePage() {
         </Card>
 
         <section>
-          <h2 className="display mb-3 text-xl text-ink">Sports</h2>
-          <ul className="space-y-2">
-            {SPORTS.map((slug) => {
-              const meta = SPORT_META[slug];
-              const state = joinedBySport.get(slug);
-              return (
-                <li key={slug}>
-                  <Link href={`/profile/sports/${slug}`} className="block">
-                    <Card className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:border-ink/40">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-semibold text-ink">{meta.label}</p>
-                        <p className="mt-0.5 text-xs text-ink/50">
-                          {!state
-                            ? "Not joined"
-                            : meta.matchingEnabled
+          <div className="mb-3 flex items-end justify-between gap-3">
+            <h2 className="display text-xl text-ink">Sports</h2>
+            <Link
+              href="/home"
+              className="stat shrink-0 text-xs font-semibold uppercase tracking-[0.08em] text-brand hover:underline"
+            >
+              + Add a sport
+            </Link>
+          </div>
+
+          {joined.length === 0 ? (
+            <Card className="px-5 py-6 text-center">
+              <p className="text-sm text-ink/65">You haven&apos;t joined a sport yet.</p>
+              <div className="mt-4">
+                <Link href="/home" className={buttonClass()}>
+                  Browse sports
+                </Link>
+              </div>
+            </Card>
+          ) : (
+            <ul className="space-y-2">
+              {SPORTS.filter((slug) => joinedBySport.has(slug)).map((slug) => {
+                const meta = SPORT_META[slug];
+                const state = joinedBySport.get(slug)!;
+                return (
+                  <li key={slug}>
+                    <Link href={`/profile/sports/${slug}`} className="block">
+                      <Card className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:border-ink/40">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[15px] font-semibold text-ink">{meta.label}</p>
+                          <p className="mt-0.5 text-xs text-ink/50">
+                            {meta.matchingEnabled
                               ? state.optedIntoMatching
                                 ? "Finding partners"
                                 : "Joined, matching paused"
                               : "Joined"}
-                        </p>
-                      </div>
-                      {state?.optedIntoMatching ? <Badge>Active</Badge> : null}
-                      <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink/30" />
-                    </Card>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                          </p>
+                        </div>
+                        {state.optedIntoMatching ? <Badge>Active</Badge> : null}
+                        <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink/30" />
+                      </Card>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
 
         <section>

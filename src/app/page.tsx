@@ -2,10 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { BoltIcon } from "@/components/icons";
+import { BoltIcon, MapPinIcon, PeopleIcon, ShapesIcon } from "@/components/icons";
 import { buttonClass } from "@/components/ui";
 import { getAccount } from "@/lib/session";
 import { SPORT_META, SPORTS } from "@/lib/sports";
+
+const WHY_SPORTME = [
+  {
+    Icon: ShapesIcon,
+    header: "Any sport, big or small",
+    copy: "Running, Jiu Jitsu, tennis, and lifting to start, with more sports added regularly.",
+  },
+  {
+    Icon: PeopleIcon,
+    header: "Find a partner or a whole group",
+    copy: "However you like to train, find people to do it with you.",
+  },
+  {
+    Icon: MapPinIcon,
+    header: "Wherever you're starting from",
+    copy: "New to the area, new to the sport, or just tired of training alone.",
+  },
+] as const;
 
 export const metadata: Metadata = {
   title: "SportMe — Workouts are better together",
@@ -73,17 +91,25 @@ export default async function LandingPage() {
         </ul>
       </section>
 
-      {/* Two paths: group or one-on-one */}
+      {/* How it works: group or one-on-one */}
       <section className="mx-auto max-w-5xl px-5 py-16 sm:py-24">
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="stat text-sm font-semibold uppercase tracking-[0.2em] text-brand">
+            How it works
+          </p>
+          <h2 className="display mt-3 text-3xl text-ink sm:text-4xl">
+            Two ways to find people for your sport.
+          </h2>
+        </div>
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
           <div className="rounded-card border border-ink/10 p-8">
-            <h2 className="display text-2xl text-ink">Join a group</h2>
+            <h3 className="display text-2xl text-ink">Join a group</h3>
             <p className="mt-3 text-ink/70">
               Find weekly meetups and groups already happening nearby for your sport.
             </p>
           </div>
           <div className="rounded-card border border-ink/10 p-8">
-            <h2 className="display text-2xl text-ink">Match one-on-one</h2>
+            <h3 className="display text-2xl text-ink">Match one-on-one</h3>
             <p className="mt-3 text-ink/70">
               Swipe through people nearby who play your sport. Match, message, and set
               up your first workout.
@@ -94,32 +120,31 @@ export default async function LandingPage() {
 
       {/* Why SportMe */}
       <section className="bg-ink px-5 py-16 sm:py-24">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="stat text-sm font-semibold uppercase tracking-[0.2em] text-brand">
-            Why SportMe
-          </h2>
-          <ul className="mt-6 space-y-6">
-            <li className="text-xl text-white sm:text-2xl">
-              All sports, big or small. Starting with running, BJJ, tennis, and lifting,
-              with more sports coming soon.
-            </li>
-            <li className="text-xl text-white sm:text-2xl">
-              Whether you want one partner or a whole group, find the people you can
-              work out with.
-            </li>
-            <li className="text-xl text-white sm:text-2xl">
-              For anyone starting fresh, new to the area, or just tired of working out
-              alone.
-            </li>
-          </ul>
+        <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="stat text-sm font-semibold uppercase tracking-[0.2em] text-brand">
+              Why SportMe
+            </p>
+            <h2 className="display mt-3 text-3xl text-white sm:text-4xl">
+              Find your next workout partner
+            </h2>
+          </div>
+
+          <div className="mt-12 grid gap-10 sm:grid-cols-3 sm:gap-8">
+            {WHY_SPORTME.map(({ Icon, header, copy }) => (
+              <div key={header} className="text-center sm:text-left">
+                <Icon className="mx-auto h-8 w-8 text-brand sm:mx-0" />
+                <h3 className="display mt-4 text-xl text-white">{header}</h3>
+                <p className="mt-2 text-white/70">{copy}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Closing CTA */}
       <section className="mx-auto max-w-2xl px-5 py-16 text-center sm:py-24">
-        <h2 className="display text-4xl text-ink sm:text-5xl">
-          Find your next workout partner
-        </h2>
+        <h2 className="display text-4xl text-ink sm:text-5xl">Get Started</h2>
         <div className="mt-8 flex justify-center">
           <Link href="/signup" className={buttonClass({ size: "lg" })}>
             Create Your Account
