@@ -8,6 +8,7 @@ import { signIn, signOut } from "../auth";
 import { prisma } from "../db";
 import { bool, str, type FormState } from "../form";
 import { normalizeIdentifier } from "../identifier";
+import { getServerPostHog } from "../posthog-server";
 import { requireAccount } from "../session";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -48,7 +49,7 @@ export async function signUpAction(
     };
   }
 
-  await prisma.account.create({
+  const account = await prisma.account.create({
     data: {
       ...where,
       authProvider: "credentials",
@@ -57,6 +58,21 @@ export async function signUpAction(
       tosAcceptedAt: new Date(),
     },
   });
+
+  // Signup completion can't be inferred from a client click alone (the same
+  // click also fires on a validation error), so it's captured here instead
+  // of relying on autocapture. distinctId ties it to the anonymous visitor
+  // who clicked the landing page CTA — posthog.identify() on the other end
+  // (see onboarding page) merges that history onto the new account.
+  const posthogServer = getServerPostHog();
+  if (posthogServer) {
+    posthogServer.capture({
+      distinctId: str(form, "distinctId") || account.id,
+      event: "account_created",
+      properties: { authProvider: "credentials" },
+    });
+    await posthogServer.shutdown();
+  }
 
   // signIn throws a NEXT_REDIRECT on success, which must propagate.
   try {

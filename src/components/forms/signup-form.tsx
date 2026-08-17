@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 import { useActionState } from "react";
 
 import { SubmitButton } from "@/components/submit-button";
@@ -10,9 +11,11 @@ import { emptyFormState, fieldError } from "@/lib/form";
 
 export function SignupForm() {
   const [state, action] = useActionState(signUpAction, emptyFormState);
+  const posthog = usePostHog();
 
   return (
     <form action={action} className="space-y-4">
+      <input type="hidden" name="distinctId" value={posthog?.get_distinct_id() ?? ""} />
       <FormError>{state.error}</FormError>
 
       <Field

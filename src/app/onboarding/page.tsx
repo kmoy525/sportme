@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { IdentifyAccount } from "@/components/analytics/identify-account";
 import { OnboardingForm } from "@/components/forms/onboarding-form";
 import { BoltIcon } from "@/components/icons";
 import { photoStorageConfigured } from "@/lib/photo";
@@ -15,6 +16,7 @@ export default async function OnboardingPage() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-white">
+      <IdentifyAccount accountId={account.id} />
       <header className="border-b border-ink/10 bg-white px-5 py-6">
         <div className="mx-auto flex max-w-md items-center gap-2 text-ink">
           <BoltIcon className="h-6 w-6 text-brand" />

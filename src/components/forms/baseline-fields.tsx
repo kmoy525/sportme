@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { usePostHog } from "posthog-js/react";
+import { useRef, useState } from "react";
 
 import { Field, inputClass } from "@/components/ui";
 import { TRAVEL_RADIUS_OPTIONS } from "@/lib/travel-radius";
@@ -36,6 +37,16 @@ export function BaselineFields({
   );
   const radius = TRAVEL_RADIUS_OPTIONS[radiusIndex];
 
+  // Fires once per field per page load — shows how far into onboarding
+  // people get before abandoning, since it's one long form with no steps.
+  const posthog = usePostHog();
+  const reportedFields = useRef(new Set<string>());
+  const reportFieldDone = (field: string) => {
+    if (reportedFields.current.has(field)) return;
+    reportedFields.current.add(field);
+    posthog?.capture("onboarding_field_completed", { field });
+  };
+
   return (
     <>
       <Field label="Name" error={fieldError(state, "name")}>
@@ -46,6 +57,7 @@ export function BaselineFields({
           maxLength={60}
           defaultValue={defaults.name}
           autoComplete="name"
+          onBlur={(e) => e.target.value && reportFieldDone("name")}
           className={inputClass}
         />
       </Field>
@@ -55,6 +67,7 @@ export function BaselineFields({
           name="ageRange"
           required
           defaultValue={defaults.ageRange ?? ""}
+          onChange={() => reportFieldDone("ageRange")}
           className={inputClass}
         >
           <option value="" disabled>
@@ -82,6 +95,7 @@ export function BaselineFields({
           type="file"
           accept="image/jpeg,image/png,image/webp"
           disabled={!photoStorageConfigured}
+          onChange={(e) => e.target.files?.length && reportFieldDone("photo")}
           className="w-full text-sm text-ink/70 file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink disabled:opacity-50"
         />
       </Field>
@@ -100,6 +114,7 @@ export function BaselineFields({
           required
           defaultValue={defaults.zipCode}
           autoComplete="postal-code"
+          onBlur={(e) => e.target.value && reportFieldDone("zipCode")}
           className={inputClass}
         />
       </Field>
@@ -119,7 +134,10 @@ export function BaselineFields({
             max={TRAVEL_RADIUS_OPTIONS.length - 1}
             step={1}
             value={radiusIndex}
-            onChange={(e) => setRadiusIndex(Number(e.target.value))}
+            onChange={(e) => {
+              setRadiusIndex(Number(e.target.value));
+              reportFieldDone("travelRadiusMiles");
+            }}
             aria-label="Travel radius in miles"
             className="w-full accent-[#ff4754]"
           />

@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { Suspense } from "react";
+
+import { PostHogPageView } from "@/components/analytics/posthog-pageview";
+import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import "./globals.css";
 
 // Heavy geometric display face — headlines and the match moment.
@@ -36,8 +40,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {children}
-        <Analytics />
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          {children}
+          <Analytics />
+        </PostHogProvider>
       </body>
     </html>
   );
