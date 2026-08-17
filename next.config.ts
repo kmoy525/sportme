@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  env: {
+    // Vercel doesn't expose its system env vars to the client by default —
+    // re-export as NEXT_PUBLIC_ so src/lib/invite.ts can build a correct
+    // share link without every environment needing NEXT_PUBLIC_APP_URL set
+    // by hand. VERCEL_PROJECT_PRODUCTION_URL is the assigned production
+    // domain (e.g. sportme-social.vercel.app); VERCEL_URL is that specific
+    // deployment's own unique hash URL, only right as a preview fallback.
+    NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    NEXT_PUBLIC_VERCEL_URL: process.env.VERCEL_URL,
+  },
 };
 
 export default nextConfig;
