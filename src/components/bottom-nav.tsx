@@ -2,18 +2,50 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { BellIcon, HomeIcon, PersonIcon } from "./icons";
+import { ChatBubbleIcon, HomeIcon, PersonIcon } from "./icons";
 import { cx } from "./ui";
 
 const TABS = [
   { href: "/home", label: "Home", Icon: HomeIcon },
-  { href: "/notifications", label: "Notifications", Icon: BellIcon },
+  { href: "/notifications", label: "Chats", Icon: ChatBubbleIcon },
   { href: "/profile", label: "Profile", Icon: PersonIcon },
 ] as const;
 
+const POLL_MS = 15000;
+
 export function BottomNav({ hasNotificationBadge }: { hasNotificationBadge: boolean }) {
   const pathname = usePathname();
+  const [hasUnread, setHasUnread] = useState(hasNotificationBadge);
+
+  // Keep in sync with the server-rendered value on every navigation (e.g.
+  // after visiting /notifications, which clears it).
+  useEffect(() => {
+    setHasUnread(hasNotificationBadge);
+  }, [hasNotificationBadge]);
+
+  // Poll so a new like or message shows up without a manual refresh.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function poll() {
+      try {
+        const res = await fetch("/api/notifications/unread", { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const body = (await res.json()) as { hasUnread: boolean };
+        if (!cancelled) setHasUnread(body.hasUnread);
+      } catch {
+        // Transient network failure — the next tick retries.
+      }
+    }
+
+    const timer = setInterval(poll, POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <nav
@@ -35,7 +67,7 @@ export function BottomNav({ hasNotificationBadge }: { hasNotificationBadge: bool
               >
                 <span className="relative">
                   <Icon className="h-6 w-6" />
-                  {href === "/notifications" && hasNotificationBadge ? (
+                  {href === "/notifications" && hasUnread ? (
                     <span
                       aria-label="New notifications"
                       className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-white"

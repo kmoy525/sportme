@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { formatDay, formatTime } from "@/components/event-carousel";
+import { ProfilePhoto } from "@/components/profile-card";
 import { ButtonLink, Card } from "@/components/ui";
 import { prisma } from "@/lib/db";
 import { googleMapsApiKey } from "@/lib/maps";
@@ -31,6 +32,7 @@ export default async function EventDetailPage({
       expectedSize: true,
       rsvpUrl: true,
       createdByProfileId: true,
+      createdBy: { select: { id: true, name: true, photoUrl: true } },
     },
   });
   if (!event) notFound();
@@ -70,6 +72,31 @@ export default async function EventDetailPage({
             />
           ) : null}
         </Card>
+
+        {event.createdBy ? (
+          <Card className="px-4 py-4">
+            <h2 className="stat mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/50">
+              Organizer
+            </h2>
+            <Link
+              href={
+                event.createdBy.id === profile.id
+                  ? "/profile"
+                  : `/partners/${event.createdBy.id}`
+              }
+              className="flex items-center gap-3 transition-opacity hover:opacity-75"
+            >
+              <ProfilePhoto
+                photoUrl={event.createdBy.photoUrl}
+                name={event.createdBy.name}
+                size="sm"
+              />
+              <span className="text-[15px] font-semibold text-ink">
+                {event.createdBy.id === profile.id ? "You" : event.createdBy.name}
+              </span>
+            </Link>
+          </Card>
+        ) : null}
 
         {event.description ? (
           <Card className="px-4 py-4">

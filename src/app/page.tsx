@@ -53,7 +53,7 @@ export default async function LandingPage() {
       {/* Hero */}
       <section className="mx-auto max-w-3xl px-5 pb-10 pt-8 text-center sm:pb-16 sm:pt-14">
         <h1 className="display text-5xl leading-[0.95] text-ink sm:text-7xl">
-          Workouts are better together.
+          Workouts are better together
         </h1>
         <div className="mt-8 flex justify-center">
           <Link href="/signup" className={buttonClass({ size: "lg" })}>
@@ -61,7 +61,7 @@ export default async function LandingPage() {
           </Link>
         </div>
         <p className="mx-auto mt-8 max-w-xl text-lg text-ink/70">
-          From running to Brazilian Jiu Jitsu, find people to work out with.
+          From running to jiu jitsu, find people to work out with.
         </p>
       </section>
 
@@ -98,12 +98,12 @@ export default async function LandingPage() {
             How it works
           </p>
           <h2 className="display mt-3 text-3xl text-ink sm:text-4xl">
-            Two ways to find people for your sport.
+            Two ways to find people for your sport
           </h2>
         </div>
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           <div className="rounded-card border border-ink/10 p-8">
-            <h3 className="display text-2xl text-ink">Join a group</h3>
+            <h3 className="display text-2xl text-ink">Find events</h3>
             <p className="mt-3 text-ink/70">
               Find weekly meetups and groups already happening nearby for your sport.
             </p>
@@ -126,7 +126,7 @@ export default async function LandingPage() {
               Why SportMe
             </p>
             <h2 className="display mt-3 text-3xl text-white sm:text-4xl">
-              Find your next workout partner
+              Never train alone
             </h2>
           </div>
 
@@ -144,7 +144,9 @@ export default async function LandingPage() {
 
       {/* Closing CTA */}
       <section className="mx-auto max-w-2xl px-5 py-16 text-center sm:py-24">
-        <h2 className="display text-4xl text-ink sm:text-5xl">Get Started</h2>
+        <h2 className="display text-4xl text-ink sm:text-5xl">
+          Find your next workout partner
+        </h2>
         <div className="mt-8 flex justify-center">
           <Link href="/signup" className={buttonClass({ size: "lg" })}>
             Create Your Account

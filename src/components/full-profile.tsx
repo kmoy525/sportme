@@ -4,7 +4,8 @@ import type { VisibleProfile } from "@/lib/profiles";
 import { ageRangeLabel } from "@/lib/enums";
 import { sportLabel } from "@/lib/sports";
 
-import { FlagIcon } from "./icons";
+import { formatDay, formatTime } from "./event-carousel";
+import { ChevronRightIcon, FlagIcon } from "./icons";
 import { ProfilePhoto } from "./profile-card";
 import { SportStats } from "./sport-stats";
 import { Card } from "./ui";
@@ -40,6 +41,32 @@ export function FullProfile({ profile }: { profile: VisibleProfile }) {
           </Card>
         );
       })}
+
+      {profile.eventsOrganized.length > 0 ? (
+        <Card className="px-4 py-4">
+          <h3 className="stat mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink">
+            Events organized
+          </h3>
+          <ul className="space-y-2">
+            {profile.eventsOrganized.map((event) => (
+              <li key={event.id}>
+                <Link href={`/events/${event.id}`} className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-semibold text-ink">
+                      {event.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-ink/50">
+                      {sportLabel(event.sport)} · {formatDay(event.eventDate)} ·{" "}
+                      {formatTime(event.startTime)}
+                    </p>
+                  </div>
+                  <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink/30" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       {/* Report must be reachable from anywhere a profile is visible. */}
       <div className="flex items-center justify-center gap-4 pt-1">

@@ -16,12 +16,21 @@ export type VisibleSportProfile = {
   lifting: LiftingStats | null;
 };
 
+export type VisibleEvent = {
+  id: string;
+  sport: Sport;
+  name: string;
+  eventDate: Date;
+  startTime: string;
+};
+
 export type VisibleProfile = {
   id: string;
   name: string;
   ageRange: string;
   photoUrl: string | null;
   sportProfiles: VisibleSportProfile[];
+  eventsOrganized: VisibleEvent[];
   isPartner: boolean;
 };
 
@@ -62,6 +71,10 @@ export async function getVisibleProfile(
           },
         },
       },
+      eventsSubmitted: {
+        orderBy: { eventDate: "desc" },
+        select: { id: true, sport: true, name: true, eventDate: true, startTime: true },
+      },
     },
   });
   if (!target) return null;
@@ -80,6 +93,7 @@ export async function getVisibleProfile(
     ageRange: target.ageRange,
     photoUrl: target.photoUrl,
     sportProfiles,
+    eventsOrganized: target.eventsSubmitted,
     isPartner,
   };
 }

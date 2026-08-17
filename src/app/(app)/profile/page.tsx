@@ -1,12 +1,13 @@
 import Link from "next/link";
 
+import { formatDay, formatTime } from "@/components/event-carousel";
 import { ChevronRightIcon } from "@/components/icons";
 import { ProfilePhoto } from "@/components/profile-card";
-import { Badge, buttonClass, Card } from "@/components/ui";
+import { Badge, buttonClass, Card, EmptyState } from "@/components/ui";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { formatPhone } from "@/lib/identifier";
 import { requireAccount, requireProfile } from "@/lib/session";
-import { SPORT_META, SPORTS } from "@/lib/sports";
+import { SPORT_META, SPORTS, sportLabel } from "@/lib/sports";
 import { prisma } from "@/lib/db";
 
 export const metadata = { title: "Profile · SportMe" };
@@ -15,12 +16,16 @@ export default async function ProfilePage() {
   const { profile } = await requireProfile();
   const account = await requireAccount();
 
-  const [joined, blockCount] = await Promise.all([
+  const [joined, eventsOrganized] = await Promise.all([
     prisma.sportProfile.findMany({
       where: { profileId: profile.id },
       select: { sport: true, optedIntoMatching: true },
     }),
-    prisma.block.count({ where: { blockerProfileId: profile.id } }),
+    prisma.event.findMany({
+      where: { createdByProfileId: profile.id },
+      orderBy: { eventDate: "desc" },
+      select: { id: true, sport: true, name: true, eventDate: true, startTime: true },
+    }),
   ]);
   const joinedBySport = new Map(joined.map((s) => [s.sport, s]));
 
@@ -98,15 +103,35 @@ export default async function ProfilePage() {
         </section>
 
         <section>
-          <Link href="/profile/blocked" className="block">
-            <Card className="flex items-center justify-between px-4 py-3.5 transition-colors hover:border-ink/40">
-              <span className="text-[15px] font-semibold text-ink">Blocked members</span>
-              <span className="flex items-center gap-2 text-ink/50">
-                {blockCount > 0 ? <span className="stat text-sm">{blockCount}</span> : null}
-                <ChevronRightIcon className="h-5 w-5" />
-              </span>
-            </Card>
-          </Link>
+          <h2 className="display mb-3 text-xl text-ink">Events organized</h2>
+
+          {eventsOrganized.length === 0 ? (
+            <EmptyState
+              title="No events yet"
+              body="Events you create will show up here."
+            />
+          ) : (
+            <ul className="space-y-2">
+              {eventsOrganized.map((event) => (
+                <li key={event.id}>
+                  <Link href={`/events/${event.id}`} className="block">
+                    <Card className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:border-ink/40">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[15px] font-semibold text-ink">
+                          {event.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-ink/50">
+                          {sportLabel(event.sport)} · {formatDay(event.eventDate)} ·{" "}
+                          {formatTime(event.startTime)}
+                        </p>
+                      </div>
+                      <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink/30" />
+                    </Card>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <form action={logoutAction}>

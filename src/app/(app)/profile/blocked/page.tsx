@@ -24,10 +24,10 @@ export default async function BlockedListPage() {
     <>
       <header className="border-b border-ink/10 bg-white px-5 pb-5 pt-6">
         <Link
-          href="/profile"
+          href="/profile/edit"
           className="stat text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55 hover:text-ink"
         >
-          ← Profile
+          ← Edit profile
         </Link>
         <h1 className="display mt-1.5 text-3xl text-ink">Blocked members</h1>
       </header>

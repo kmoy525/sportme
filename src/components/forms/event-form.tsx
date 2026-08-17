@@ -7,7 +7,9 @@ import { Field, FormError, inputClass } from "@/components/ui";
 import { createEventAction, updateEventAction } from "@/lib/actions/event-actions";
 import { emptyFormState, fieldError } from "@/lib/form";
 import { googleMapsApiKey } from "@/lib/maps";
+import { SPORT_META, type SportSlug } from "@/lib/sports";
 
+import { EventDatePicker } from "./event-date-picker";
 import { LocationAutocomplete } from "./location-autocomplete";
 
 export type EventDefaults = {
@@ -38,9 +40,25 @@ export function EventForm({
     emptyFormState,
   );
   const apiKey = googleMapsApiKey();
+  const meta = SPORT_META[sport as SportSlug];
 
   return (
-    <form action={action} className="space-y-5">
+    <form
+      action={action}
+      onSubmit={(e) => {
+        const data = new FormData(e.currentTarget);
+        const eventDate = data.get("eventDate")?.toString();
+        const startTime = data.get("startTime")?.toString();
+        if (!eventDate || !startTime) return;
+
+        const when = new Date(`${eventDate}T${startTime}:00`);
+        if (!Number.isNaN(when.getTime()) && when.getTime() < Date.now()) {
+          e.preventDefault();
+          window.alert("Events can't be scheduled in the past.");
+        }
+      }}
+      className="space-y-5"
+    >
       <input type="hidden" name="sport" value={sport} />
       {eventId ? <input type="hidden" name="eventId" value={eventId} /> : null}
       <FormError>{state.error}</FormError>
@@ -52,7 +70,7 @@ export function EventForm({
           required
           maxLength={100}
           defaultValue={defaults?.name}
-          placeholder="Sunday open mat"
+          placeholder={meta.eventNamePlaceholder}
           className={inputClass}
         />
       </Field>
@@ -66,13 +84,7 @@ export function EventForm({
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Date" error={fieldError(state, "eventDate")}>
-          <input
-            name="eventDate"
-            type="date"
-            required
-            defaultValue={defaults?.eventDate}
-            className={inputClass}
-          />
+          <EventDatePicker name="eventDate" defaultValue={defaults?.eventDate} />
         </Field>
         <Field label="Start time" error={fieldError(state, "startTime")}>
           <input
@@ -102,7 +114,7 @@ export function EventForm({
           rows={4}
           maxLength={1000}
           defaultValue={defaults?.description}
-          placeholder="Casual rolling, all levels. Bring a gi or come no-gi…"
+          placeholder={meta.eventDescriptionPlaceholder}
           className={inputClass}
         />
       </Field>

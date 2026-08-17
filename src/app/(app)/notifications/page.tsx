@@ -84,6 +84,12 @@ export default async function NotificationsPage() {
                     className="block"
                   >
                     <Card className="flex items-center gap-3 px-3 py-3 transition-colors hover:border-ink/40">
+                      <span
+                        aria-hidden
+                        className={`h-2 w-2 shrink-0 rounded-full ${
+                          partner.unread ? "bg-brand" : "bg-transparent"
+                        }`}
+                      />
                       <ProfilePhoto
                         photoUrl={partner.photoUrl}
                         name={partner.name}
@@ -100,11 +106,17 @@ export default async function NotificationsPage() {
                             </Badge>
                           ))}
                         </div>
-                        <p className="mt-0.5 truncate text-sm text-ink/55">
-                          {partner.lastMessage
-                            ? `${partner.lastMessage.fromViewer ? "You: " : ""}${partner.lastMessage.content}`
-                            : "Say hi →"}
-                        </p>
+                        {partner.meetupCheckDue ? (
+                          <p className="mt-0.5 truncate text-sm font-semibold text-brand">
+                            Did you work out together?
+                          </p>
+                        ) : (
+                          <p className="mt-0.5 truncate text-sm text-ink/55">
+                            {partner.lastMessage
+                              ? `${partner.lastMessage.fromViewer ? "You: " : ""}${partner.lastMessage.content}`
+                              : "Say hi →"}
+                          </p>
+                        )}
                       </div>
                       <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink/30" />
                     </Card>

@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 
 import { ChatThread } from "@/components/chat-thread";
 import { FlagIcon } from "@/components/icons";
+import { MeetupCheckModal } from "@/components/meetup-check-modal";
 import { ProfilePhoto } from "@/components/profile-card";
 import { prisma } from "@/lib/db";
+import { isMeetupCheckDue } from "@/lib/meetup-check";
 import { markChatRead } from "@/lib/notifications";
 import { requireProfile } from "@/lib/session";
 import { isBlockedBetween } from "@/lib/visibility";
@@ -70,8 +72,12 @@ export default async function ChatPage({
   // Clears this chat's half of the Notifications nav badge.
   await markChatRead(chat.id, profile.id);
 
+  const meetupCheckDue = await isMeetupCheckDue(chat.id);
+
   return (
     <>
+      <MeetupCheckModal chatId={chat.id} partnerName={partner.name} due={meetupCheckDue} />
+
       <header className="sticky top-0 z-30 flex items-center gap-3 bg-white px-5 py-3">
         <Link
           href="/notifications"

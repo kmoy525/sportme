@@ -239,6 +239,22 @@ export async function setMatchingOptInAction(form: FormData) {
   revalidatePath("/profile");
 }
 
+/**
+ * Delete a single sport profile (and its sport-specific fields, via cascade)
+ * without affecting the account or the member's other sport profiles.
+ */
+export async function deleteSportProfileAction(form: FormData) {
+  const { profile } = await requireProfile();
+  const sport = parseSport(str(form, "sport"));
+  if (!sport) return;
+
+  await prisma.sportProfile.deleteMany({ where: { profileId: profile.id, sport } });
+
+  revalidatePath(`/sports/${sport}`);
+  revalidatePath("/profile");
+  redirect("/profile");
+}
+
 /** Join a sport without opting into matching. */
 export async function joinSportAction(form: FormData) {
   const { profile } = await requireProfile();

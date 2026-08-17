@@ -11,6 +11,8 @@ type SportMeta = {
   lowerLabel: string;
   /** Sport-specific phrase for the match celebration. */
   matchPhrase: string;
+  /** Sport-specific phrase for the invite-a-friend SMS/WhatsApp message. */
+  smsPhrase: string;
   /** Whether "Find a Partner" is built for this sport yet (MVP: jiu-jitsu only). */
   matchingEnabled: boolean;
   /**
@@ -20,6 +22,10 @@ type SportMeta = {
   imageUrl: string;
   /** Sample text shown as the opt-in description field's placeholder. */
   descriptionPlaceholder: string;
+  /** Sample text shown as the event form's name field placeholder. */
+  eventNamePlaceholder: string;
+  /** Sample text shown as the event form's description field placeholder. */
+  eventDescriptionPlaceholder: string;
   /** Extra strings the homepage search should match on. */
   searchTerms: string[];
 };
@@ -29,11 +35,14 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     label: "Jiu-Jitsu",
     lowerLabel: "jiu-jitsu",
     matchPhrase: "Let's roll",
+    smsPhrase: "roll with",
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1585537884613-1a9bcd024983?auto=format&fit=crop&w=1200&q=80",
     descriptionPlaceholder:
       "Just moved to US and want to find people to do bjj with. LMK if you're interested!",
+    eventNamePlaceholder: "Sunday open mat",
+    eventDescriptionPlaceholder: "Casual rolling, all levels. Bring a gi or come no-gi…",
     searchTerms: [
       "bjj",
       "jiu-jitsu",
@@ -52,33 +61,45 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     label: "Running",
     lowerLabel: "running",
     matchPhrase: "Let's run",
+    smsPhrase: "run with",
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&w=1200&q=80",
     descriptionPlaceholder:
       "Looking for a running buddy! Training for my first 5K and would like someone to chat with as we train.",
+    eventNamePlaceholder: "Saturday morning group run",
+    eventDescriptionPlaceholder:
+      "Easy-paced group run, all paces welcome. Meet at the trailhead.",
     searchTerms: ["run", "running", "jog", "jogging", "5k", "10k", "marathon", "track"],
   },
   tennis: {
     label: "Tennis",
     lowerLabel: "tennis",
     matchPhrase: "Let's play",
+    smsPhrase: "play tennis with",
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1548920168-70d61248a912?auto=format&fit=crop&w=1200&q=80",
     descriptionPlaceholder:
       "Looking to start playing tennis again. Played in high school and want a buddy to get me back into it.",
+    eventNamePlaceholder: "Weeknight hitting session",
+    eventDescriptionPlaceholder:
+      "Casual hitting session, singles or doubles. All levels welcome.",
     searchTerms: ["tennis", "singles", "doubles", "racquet", "racket"],
   },
   lifting: {
     label: "Lifting",
     lowerLabel: "lifting",
     matchPhrase: "Let's lift",
+    smsPhrase: "find people to lift with",
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",
     descriptionPlaceholder:
       "Let's lift together! I just finished personal training sessions in India and would like to help someone train.",
+    eventNamePlaceholder: "Tuesday lifting session",
+    eventDescriptionPlaceholder:
+      "Group lifting session at the gym, spotters welcome. All levels.",
     searchTerms: [
       "lift",
       "lifting",

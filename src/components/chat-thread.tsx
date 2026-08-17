@@ -108,7 +108,7 @@ export function ChatThread({
 
   return (
     <div className="flex min-h-[60vh] flex-col">
-      <div className="flex-1 space-y-2.5 px-5 py-4">
+      <div className="flex-1 space-y-2.5 px-5 py-4 pb-40">
         {messages.length === 0 ? (
           <div className="py-6 text-center">
             <p className="text-sm text-ink/55">
@@ -125,7 +125,7 @@ export function ChatThread({
             <p
               className={
                 message.fromViewer
-                  ? "max-w-[80%] rounded-xl rounded-br-sm bg-white px-3 py-2 text-[15px] text-ink"
+                  ? "max-w-[80%] rounded-xl rounded-br-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
                   : "max-w-[80%] rounded-xl rounded-bl-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
               }
             >
@@ -136,51 +136,53 @@ export function ChatThread({
         <div ref={bottomRef} />
       </div>
 
-      {/* Starter prompts on first open — client-side only, no DB table. */}
-      {messages.length === 0 ? (
-        <div className="flex flex-wrap gap-2 px-5 pb-3">
-          {starterPrompts.map((prompt) => (
-            <button
-              key={prompt}
-              type="button"
-              onClick={() => {
-                setDraft(prompt);
-                inputRef.current?.focus();
-              }}
-              className="rounded-full border border-ink/25 bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink/50 hover:bg-ink/5"
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 border-t border-ink/10 bg-white">
+        <div className="mx-auto max-w-md px-5 py-3">
+          {/* Starter prompts on first open — client-side only, no DB table. */}
+          {messages.length === 0 ? (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {starterPrompts.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => {
+                    setDraft(prompt);
+                    inputRef.current?.focus();
+                  }}
+                  className="rounded-full border border-ink/25 bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink/50 hover:bg-ink/5"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-      <div className="sticky bottom-0 border-t border-ink/10 bg-white px-5 py-3">
-        <FormError>{error}</FormError>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send(draft);
-          }}
-          className="mt-1 flex items-center gap-2"
-        >
-          <input
-            ref={inputRef}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={`Message ${partnerName}…`}
-            aria-label="Message"
-            maxLength={2000}
-            className={inputClass}
-          />
-          <button
-            type="submit"
-            disabled={pending || draft.trim().length === 0}
-            className="h-11 shrink-0 rounded-full bg-brand px-5 text-[15px] font-semibold text-white transition-colors hover:bg-brand/90 disabled:opacity-40"
+          <FormError>{error}</FormError>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              send(draft);
+            }}
+            className="mt-1 flex items-center gap-2"
           >
-            Send
-          </button>
-        </form>
+            <input
+              ref={inputRef}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder={`Message ${partnerName}…`}
+              aria-label="Message"
+              maxLength={2000}
+              className={inputClass}
+            />
+            <button
+              type="submit"
+              disabled={pending || draft.trim().length === 0}
+              className="h-11 shrink-0 rounded-full bg-brand px-5 text-[15px] font-semibold text-white transition-colors hover:bg-brand/90 disabled:opacity-40"
+            >
+              Send
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

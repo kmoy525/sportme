@@ -19,7 +19,7 @@ export function appUrl(): string {
   return "http://localhost:3000";
 }
 
-/** @param sportLabel Lowercase, mid-sentence form — e.g. "running", "jiu jitsu". */
-export function inviteMessage(sportLabel: string): string {
-  return `Hey! I found this app for finding people to do ${sportLabel} with (and other sports). Check it out: ${appUrl()}`;
+/** @param smsPhrase A sport's `SPORT_META[...].smsPhrase`, e.g. "run with", "play tennis with". */
+export function inviteMessage(smsPhrase: string): string {
+  return `Hey! I found this app to ${smsPhrase} (and other sports). Check it out: ${appUrl()}`;
 }

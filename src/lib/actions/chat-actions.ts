@@ -46,3 +46,30 @@ export async function sendMessageAction(
   revalidatePath(`/chats/${chat.id}`);
   return {};
 }
+
+/**
+ * Records the "Did you work out together?" response. Whoever answers first
+ * settles it for both sides — the row's mere existence is what stops the
+ * prompt from showing again (see isMeetupCheckDue).
+ */
+export async function respondMeetupCheckAction(chatId: string, workedOut: boolean) {
+  const { profile } = await requireProfile();
+
+  const chat = await prisma.chat.findUnique({
+    where: { id: chatId },
+    select: { id: true, match: { select: { profileAId: true, profileBId: true } } },
+  });
+  if (!chat) return;
+
+  const { profileAId, profileBId } = chat.match;
+  if (profile.id !== profileAId && profile.id !== profileBId) return;
+
+  await prisma.meetupCheck.upsert({
+    where: { chatId },
+    update: {},
+    create: { chatId, workedOut },
+  });
+
+  revalidatePath(`/chats/${chatId}`);
+  revalidatePath("/notifications");
+}

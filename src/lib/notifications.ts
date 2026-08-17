@@ -3,6 +3,7 @@ import "server-only";
 import type { Sport } from "@/generated/prisma/enums";
 
 import { prisma } from "./db";
+import { dueMeetupCheckChatIds } from "./meetup-check";
 import { blockedIds } from "./visibility";
 
 export type IncomingLike = {
@@ -75,6 +76,10 @@ export type PartnerSummary = {
   sports: Sport[];
   lastMessage: { content: string; createdAt: Date; fromViewer: boolean } | null;
   lastActivity: Date;
+  /** True when the partner's last message hasn't been read in this chat yet. */
+  unread: boolean;
+  /** True when "Did you work out together?" should replace the preview text. */
+  meetupCheckDue: boolean;
 };
 
 /**
@@ -156,12 +161,34 @@ export async function getPartners(profileId: string): Promise<PartnerSummary[]> 
           }
         : null,
       lastActivity,
+      unread: false,
+      meetupCheckDue: false,
     });
   }
 
-  return [...byPartner.values()].sort(
-    (a, b) => b.lastActivity.getTime() - a.lastActivity.getTime(),
-  );
+  const partners = [...byPartner.values()];
+
+  const chatIds = partners.flatMap((p) => (p.chatId ? [p.chatId] : []));
+  if (chatIds.length > 0) {
+    const [reads, dueChatIds] = await Promise.all([
+      prisma.chatRead.findMany({
+        where: { profileId, chatId: { in: chatIds } },
+        select: { chatId: true, lastReadAt: true },
+      }),
+      dueMeetupCheckChatIds(chatIds),
+    ]);
+    const lastReadByChat = new Map(reads.map((r) => [r.chatId, r.lastReadAt]));
+
+    for (const partner of partners) {
+      if (!partner.chatId) continue;
+      partner.meetupCheckDue = dueChatIds.has(partner.chatId);
+      if (!partner.lastMessage || partner.lastMessage.fromViewer) continue;
+      partner.unread =
+        partner.lastMessage.createdAt > (lastReadByChat.get(partner.chatId) ?? EPOCH);
+    }
+  }
+
+  return partners.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
 }
 
 /** True once the two profiles are Training Partners in any sport. */

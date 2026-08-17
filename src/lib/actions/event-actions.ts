@@ -73,6 +73,13 @@ function readEventFields(form: FormData): ParsedEventFields {
     fieldErrors.eventDate = "That date isn't valid.";
   }
 
+  if (!fieldErrors.eventDate && !fieldErrors.startTime && eventDate && startTime) {
+    const dateTime = new Date(`${eventDate}T${startTime}:00Z`);
+    if (!Number.isNaN(dateTime.getTime()) && dateTime.getTime() < Date.now()) {
+      fieldErrors.eventDate = "Events can't be scheduled in the past.";
+    }
+  }
+
   return {
     fieldErrors,
     values: {

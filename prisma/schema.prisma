@@ -350,11 +350,27 @@ model Chat {
   matchId   String   @unique @map("match_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  match    Match      @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  messages Message[]
-  reads    ChatRead[]
+  match       Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  messages    Message[]
+  reads       ChatRead[]
+  meetupCheck MeetupCheck?
 
   @@map("chats")
+}
+
+/// "Did you work out together?" prompt. Due once a chat has >= 5 messages and
+/// its last message is >= 3 days old; a row here means it's been answered
+/// (or dismissed), so the prompt never shows again for that chat.
+model MeetupCheck {
+  id        String   @id @default(cuid())
+  chatId    String   @unique @map("chat_id")
+  /// true = thumbs up ("yes, we worked out"), false = thumbs down.
+  workedOut Boolean @map("worked_out")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("meetup_checks")
 }
 
 model Message {

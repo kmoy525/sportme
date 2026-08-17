@@ -143,3 +143,14 @@ export async function oauthSignInAction(form: FormData) {
 export async function logoutAction() {
   await signOut({ redirectTo: "/login" });
 }
+
+/**
+ * Deleting the account cascades through every relation owned by its profile
+ * (sport profiles, likes, matches, chats, messages, blocks, reports) per the
+ * schema's onDelete rules. Events they created are kept (organizer set null).
+ */
+export async function deleteAccountAction() {
+  const account = await requireAccount();
+  await prisma.account.delete({ where: { id: account.id } });
+  await signOut({ redirectTo: "/" });
+}

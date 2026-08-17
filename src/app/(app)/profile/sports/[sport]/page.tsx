@@ -5,8 +5,9 @@ import { BjjFieldsForm } from "@/components/forms/bjj-fields-form";
 import { LiftingFieldsForm } from "@/components/forms/lifting-fields-form";
 import { RunningFieldsForm } from "@/components/forms/running-fields-form";
 import { TennisFieldsForm } from "@/components/forms/tennis-fields-form";
+import { ConfirmButton } from "@/components/confirm-button";
 import { ButtonLink, Card } from "@/components/ui";
-import { setMatchingOptInAction } from "@/lib/actions/sport-actions";
+import { deleteSportProfileAction, setMatchingOptInAction } from "@/lib/actions/sport-actions";
 import { prisma } from "@/lib/db";
 import { requireProfile } from "@/lib/session";
 import { parseSport, SPORT_META, type SportSlug } from "@/lib/sports";
@@ -118,6 +119,30 @@ export default async function ManageSportPage({
                   submitLabel="Save changes"
                 />
               )}
+            </div>
+
+            <div>
+              <h2 className="display mb-3 text-xl text-ink">Danger zone</h2>
+              <Card className="flex items-center justify-between px-4 py-3.5">
+                <div>
+                  <p className="text-[15px] font-semibold text-ink">
+                    Delete {meta.label} profile
+                  </p>
+                  <p className="mt-0.5 text-xs text-ink/50">
+                    Removes your {meta.lowerLabel} details and matching. Your account and
+                    other sports are unaffected.
+                  </p>
+                </div>
+                <form action={deleteSportProfileAction}>
+                  <input type="hidden" name="sport" value={sport} />
+                  <ConfirmButton
+                    confirmMessage={`Delete your ${meta.label} profile? This can't be undone.`}
+                    className="stat shrink-0 text-xs font-semibold uppercase tracking-[0.08em] text-red-600 hover:underline"
+                  >
+                    Delete
+                  </ConfirmButton>
+                </form>
+              </Card>
             </div>
           </>
         )}

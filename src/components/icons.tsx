@@ -40,6 +40,14 @@ export function BellIcon({ className }: IconProps) {
   );
 }
 
+export function ChatBubbleIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
+      <path d="M12 2C6.48 2 2 5.86 2 10.6c0 2.62 1.4 4.96 3.6 6.53-.12 1.24-.5 2.7-1.5 4.07a.5.5 0 0 0 .55.77c2.1-.55 3.85-1.55 5.03-2.36.74.13 1.51.19 2.32.19 5.52 0 10-3.86 10-8.6S17.52 2 12 2Z" />
+    </svg>
+  );
+}
+
 export function PersonIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
