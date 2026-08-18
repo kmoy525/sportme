@@ -32,6 +32,7 @@ export default async function EditProfilePage() {
           defaults={{
             name: profile.name,
             ageRange: profile.ageRange,
+            gender: profile.gender,
             zipCode: profile.zipCode,
             travelRadiusMiles: profile.travelRadiusMiles,
             photoUrl: profile.photoUrl,
@@ -50,15 +51,12 @@ export default async function EditProfilePage() {
         </Link>
 
         <div>
-          <h2 className="display mb-3 text-xl text-ink">Danger zone</h2>
+          <h2 className="display mb-3 text-xl text-ink">Delete account</h2>
           <Card className="flex items-center justify-between px-4 py-3.5">
-            <div>
-              <p className="text-[15px] font-semibold text-ink">Delete account</p>
-              <p className="mt-0.5 text-xs text-ink/50">
-                Permanently deletes your profile, matches, and messages. This can&apos;t
-                be undone.
-              </p>
-            </div>
+            <p className="text-xs text-ink/50">
+              Permanently deletes your profile, matches, and messages. This can&apos;t be
+              undone.
+            </p>
             <form action={deleteAccountAction}>
               <ConfirmButton
                 confirmMessage="Delete your account? This permanently removes your profile, matches, and messages, and can't be undone."

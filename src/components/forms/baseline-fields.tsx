@@ -5,13 +5,14 @@ import { useRef, useState } from "react";
 
 import { Field, inputClass } from "@/components/ui";
 import { TRAVEL_RADIUS_OPTIONS } from "@/lib/travel-radius";
-import { AGE_RANGE_OPTIONS } from "@/lib/enums";
+import { AGE_RANGE_OPTIONS, GENDER_OPTIONS } from "@/lib/enums";
 import type { FormState } from "@/lib/form";
 import { fieldError } from "@/lib/form";
 
 export type BaselineDefaults = {
   name?: string;
   ageRange?: string;
+  gender?: string | null;
   zipCode?: string;
   travelRadiusMiles?: number;
   photoUrl?: string | null;
@@ -74,6 +75,22 @@ export function BaselineFields({
             Select…
           </option>
           {AGE_RANGE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field label="Gender" hint="Optional." error={fieldError(state, "gender")}>
+        <select
+          name="gender"
+          defaultValue={defaults.gender ?? ""}
+          onChange={() => reportFieldDone("gender")}
+          className={inputClass}
+        >
+          <option value="">Prefer not to answer</option>
+          {GENDER_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
             </option>

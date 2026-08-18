@@ -21,5 +21,5 @@ export function appUrl(): string {
 
 /** @param smsPhrase A sport's `SPORT_META[...].smsPhrase`, e.g. "run with", "play tennis with". */
 export function inviteMessage(smsPhrase: string): string {
-  return `Hey! I found this app to ${smsPhrase} (and other sports). Check it out: ${appUrl()}`;
+  return `Hey! I found this app to find people to ${smsPhrase}. Check it out: ${appUrl()}`;
 }
