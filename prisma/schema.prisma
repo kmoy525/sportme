@@ -26,6 +26,15 @@ enum AgeRange {
   age_55_plus @map("55+")
 }
 
+/// Optional and unset by default — distinct from `prefer_not_to_say`, which is
+/// an explicit choice not to share, versus simply never having answered.
+enum Gender {
+  male
+  female
+  non_binary
+  prefer_not_to_say
+}
+
 enum Belt {
   white
   blue
@@ -146,6 +155,8 @@ model Profile {
   accountId             String    @unique @map("account_id")
   name                  String
   ageRange              AgeRange  @map("age_range")
+  /// Optional; null means never answered (distinct from prefer_not_to_say).
+  gender                Gender?
   photoUrl              String?   @map("photo_url")
   zipCode               String    @map("zip_code")
   /// Geocoded server-side from zipCode. NEVER serialized to the client.
@@ -365,7 +376,7 @@ model MeetupCheck {
   id        String   @id @default(cuid())
   chatId    String   @unique @map("chat_id")
   /// true = thumbs up ("yes, we worked out"), false = thumbs down.
-  workedOut Boolean @map("worked_out")
+  workedOut Boolean  @map("worked_out")
   createdAt DateTime @default(now()) @map("created_at")
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
