@@ -91,7 +91,7 @@ export const SPORT_META: Record<SportSlug, SportMeta> = {
     label: "Lifting",
     lowerLabel: "lifting",
     matchPhrase: "Let's lift",
-    smsPhrase: "find people to lift with",
+    smsPhrase: "lift with",
     matchingEnabled: true,
     imageUrl:
       "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",

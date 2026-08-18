@@ -16,7 +16,15 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isAuthed = Boolean(req.auth?.accountId);
 
-  const publicPaths = ["/login", "/signup", "/terms", "/api/auth"];
+  const publicPaths = [
+    "/login",
+    "/signup",
+    "/terms",
+    "/api/auth",
+    "/icon",
+    "/apple-icon",
+    "/opengraph-image",
+  ];
   const isPublic =
     pathname === "/" || publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 

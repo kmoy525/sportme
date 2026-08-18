@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { prisma } from "../db";
 import { isTravelRadius } from "../distance";
-import { isAgeRange } from "../enums";
+import { isAgeRange, isGender } from "../enums";
 import { int, str, type FormState } from "../form";
 import { geocodeZip, isValidZip } from "../geocode";
 import { fileFrom, uploadProfilePhoto } from "../photo";
@@ -15,14 +15,18 @@ import { requireAccount, requireProfile } from "../session";
 function readBaseline(form: FormData, fallbackRadius = 25) {
   const name = str(form, "name");
   const ageRangeRaw = str(form, "ageRange");
+  const genderRaw = str(form, "gender");
   const zipCode = str(form, "zipCode");
   const radius = int(form, "travelRadiusMiles") ?? fallbackRadius;
 
   const ageRange = isAgeRange(ageRangeRaw) ? ageRangeRaw : null;
+  // Genuinely optional: blank means null, not a forced default.
+  const gender = genderRaw ? (isGender(genderRaw) ? genderRaw : null) : null;
 
   const fieldErrors: Record<string, string> = {};
   if (!name) fieldErrors.name = "Tell people what to call you.";
   if (!ageRange) fieldErrors.ageRange = "Pick an age range.";
+  if (genderRaw && !gender) fieldErrors.gender = "Pick a valid option, or leave it blank.";
   if (!isValidZip(zipCode)) fieldErrors.zipCode = "Enter a 5-digit US zip code.";
   if (!isTravelRadius(radius)) fieldErrors.travelRadiusMiles = "Pick a travel radius.";
 
@@ -31,7 +35,7 @@ function readBaseline(form: FormData, fallbackRadius = 25) {
   }
   return {
     ok: true as const,
-    values: { name, ageRange, zipCode, radius },
+    values: { name, ageRange, gender, zipCode, radius },
   };
 }
 
@@ -45,7 +49,7 @@ export async function onboardingAction(
 
   const parsed = readBaseline(form);
   if (!parsed.ok) return { fieldErrors: parsed.fieldErrors };
-  const { name, ageRange, zipCode, radius } = parsed.values;
+  const { name, ageRange, gender, zipCode, radius } = parsed.values;
 
   const point = await geocodeZip(zipCode);
   if (!point) {
@@ -62,6 +66,7 @@ export async function onboardingAction(
       accountId: account.id,
       name,
       ageRange,
+      gender,
       photoUrl: photo.url,
       zipCode,
       lat: point.lat,
@@ -81,7 +86,7 @@ export async function updateProfileAction(
 
   const parsed = readBaseline(form, profile.travelRadiusMiles);
   if (!parsed.ok) return { fieldErrors: parsed.fieldErrors };
-  const { name, ageRange, zipCode, radius } = parsed.values;
+  const { name, ageRange, gender, zipCode, radius } = parsed.values;
 
   // Only re-geocode when the zip actually changed.
   let coords = { lat: profile.lat, lng: profile.lng };
@@ -103,6 +108,7 @@ export async function updateProfileAction(
     data: {
       name,
       ageRange,
+      gender,
       zipCode,
       lat: coords.lat,
       lng: coords.lng,
