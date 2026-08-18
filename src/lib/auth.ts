@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
 import { prisma } from "./db";
 import { normalizeIdentifier } from "./identifier";
+import { getServerPostHog } from "./posthog-server";
 
 const providers: Provider[] = [
   Credentials({
@@ -81,6 +82,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       });
       token.accountId = record.id;
       return token;
+    },
+  },
+  events: {
+    // signIn() throws a NEXT_REDIRECT on success, so success can't be
+    // observed from inside loginAction/signUpAction directly — this event
+    // fires exactly once per successful sign-in regardless of call site.
+    // Scoped to credentials for now (no Google/Apple configured yet); user.id
+    // is our own account id there since authorize() returns it directly.
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials" || !user.id) return;
+      const posthogServer = getServerPostHog();
+      if (!posthogServer) return;
+      posthogServer.capture({ distinctId: user.id, event: "login_succeeded" });
+      await posthogServer.shutdown();
     },
   },
 });

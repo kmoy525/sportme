@@ -1,3 +1,4 @@
+import { IdentifyAccount } from "@/components/analytics/identify-account";
 import { BoltIcon } from "@/components/icons";
 import { SportSearch } from "@/components/sport-search";
 import { prisma } from "@/lib/db";
@@ -7,7 +8,7 @@ import { SPORTS } from "@/lib/sports";
 export const metadata = { title: "Home · SportMe" };
 
 export default async function HomePage() {
-  const { profile } = await requireProfile();
+  const { account, profile } = await requireProfile();
 
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
@@ -35,6 +36,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <IdentifyAccount accountId={account.id} />
       <header className="border-b border-ink/10 bg-white px-5 pb-6 pt-7">
         <div className="flex items-center gap-2 text-ink">
           <BoltIcon className="h-6 w-6 text-brand" />
