@@ -1,7 +1,6 @@
 import type {
   AgeRange,
   Belt,
-  Gender,
   GymMembership,
   LiftingGoal,
   LiftingProgram,
@@ -20,15 +19,6 @@ export const AGE_RANGE_OPTIONS: { value: AgeRange; label: string }[] = [
   { value: "age_35_44", label: "35-44" },
   { value: "age_45_54", label: "45-54" },
   { value: "age_55_plus", label: "55+" },
-];
-
-/// Optional. No option here corresponds to "blank" — leaving the field
-/// unselected means null, distinct from choosing "Prefer not to say".
-export const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "non_binary", label: "Non-binary" },
-  { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
 
 export const BELT_OPTIONS: { value: Belt; label: string; swatch: string }[] = [
@@ -185,15 +175,6 @@ export function reportReasonLabel(value: string): string {
 
 export function isAgeRange(value: string): value is AgeRange {
   return AGE_RANGE_OPTIONS.some((o) => o.value === value);
-}
-
-export function genderLabel(value: string | null): string {
-  if (!value) return "—";
-  return GENDER_OPTIONS.find((o) => o.value === value)?.label ?? value;
-}
-
-export function isGender(value: string): value is Gender {
-  return GENDER_OPTIONS.some((o) => o.value === value);
 }
 
 export function isBelt(value: string): value is Belt {

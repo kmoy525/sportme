@@ -5,7 +5,6 @@ import { Suspense } from "react";
 
 import { PostHogPageView } from "@/components/analytics/posthog-pageview";
 import { PostHogProvider } from "@/components/analytics/posthog-provider";
-import { appUrl } from "@/lib/invite";
 import "./globals.css";
 
 // Heavy geometric display face — headlines and the match moment.
@@ -17,7 +16,6 @@ const display = Sora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(appUrl()),
   title: "SportMe",
   description: "Workouts are better together. Find people to train with, by sport.",
 };

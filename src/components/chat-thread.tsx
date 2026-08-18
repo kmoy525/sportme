@@ -16,31 +16,6 @@ export type ChatMessage = {
 
 const POLL_MS = 4000;
 
-function isSameDay(a: Date, b: Date): boolean {
-  return a.toDateString() === b.toDateString();
-}
-
-function formatMessageTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-}
-
-/** Centered divider shown whenever a message lands on a new calendar day. */
-function formatDateDivider(iso: string): string {
-  const date = new Date(iso);
-  const today = new Date();
-  if (isSameDay(date, today)) return "Today";
-
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (isSameDay(date, yesterday)) return "Yesterday";
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: date.getFullYear() === today.getFullYear() ? undefined : "numeric",
-  });
-}
-
 export function ChatThread({
   chatId,
   initialMessages,
@@ -142,42 +117,22 @@ export function ChatThread({
           </div>
         ) : null}
 
-        {messages.map((message, i) => {
-          const prev = messages[i - 1];
-          const showDivider =
-            !prev || !isSameDay(new Date(prev.createdAt), new Date(message.createdAt));
-
-          return (
-            <div key={message.id}>
-              {showDivider ? (
-                <div className="py-2 text-center">
-                  <span className="stat text-[10px] font-semibold uppercase tracking-[0.1em] text-ink/40">
-                    {formatDateDivider(message.createdAt)}
-                  </span>
-                </div>
-              ) : null}
-
-              <div
-                className={
-                  message.fromViewer ? "flex flex-col items-end" : "flex flex-col items-start"
-                }
-              >
-                <p
-                  className={
-                    message.fromViewer
-                      ? "max-w-[80%] rounded-xl rounded-br-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
-                      : "max-w-[80%] rounded-xl rounded-bl-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
-                  }
-                >
-                  {message.content}
-                </p>
-                <span className="mt-1 px-1 text-[11px] text-ink/40">
-                  {formatMessageTime(message.createdAt)}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={message.fromViewer ? "flex justify-end" : "flex justify-start"}
+          >
+            <p
+              className={
+                message.fromViewer
+                  ? "max-w-[80%] rounded-xl rounded-br-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
+                  : "max-w-[80%] rounded-xl rounded-bl-sm border border-ink/10 bg-white px-3 py-2 text-[15px] text-ink"
+              }
+            >
+              {message.content}
+            </p>
+          </div>
+        ))}
         <div ref={bottomRef} />
       </div>
 
