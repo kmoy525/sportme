@@ -2,10 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { formatDay, formatTime } from "@/components/event-carousel";
-import { ConfirmButton } from "@/components/confirm-button";
 import { ProfilePhoto } from "@/components/profile-card";
-import { buttonClass, ButtonLink, Card } from "@/components/ui";
-import { deleteEventAction } from "@/lib/actions/event-actions";
+import { ButtonLink, Card } from "@/components/ui";
 import { prisma } from "@/lib/db";
 import { googleMapsApiKey } from "@/lib/maps";
 import { requireProfile } from "@/lib/session";
@@ -121,20 +119,9 @@ export default async function EventDetailPage({
             </a>
           ) : null}
           {canEdit ? (
-            <ButtonLink href={`/events/${event.id}/edit`} variant="outline" full className="flex-1">
+            <ButtonLink href={`/events/${event.id}/edit`} variant="outline" full={!event.rsvpUrl}>
               Edit event
             </ButtonLink>
-          ) : null}
-          {canEdit ? (
-            <form className="flex-1" action={deleteEventAction}>
-              <input type="hidden" name="eventId" value={event.id} />
-              <ConfirmButton
-                confirmMessage={`Delete "${event.name}"? This removes it for everyone and can't be undone.`}
-                className={buttonClass({ variant: "danger", full: true })}
-              >
-                Delete event
-              </ConfirmButton>
-            </form>
           ) : null}
         </div>
       </main>

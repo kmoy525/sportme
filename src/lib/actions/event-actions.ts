@@ -196,29 +196,6 @@ export async function updateEventAction(
   redirect(`/events/${eventId}`);
 }
 
-/**
- * Only the member who submitted an event can delete it. Admin-curated events
- * (createdByProfileId is null) are never user-deletable, enforced here — not
- * just hidden in the UI. Event has no incoming FKs, so this is a plain delete.
- */
-export async function deleteEventAction(form: FormData) {
-  const { profile } = await requireProfile();
-  const eventId = str(form, "eventId");
-
-  const existing = await prisma.event.findUnique({
-    where: { id: eventId },
-    select: { id: true, sport: true, createdByProfileId: true },
-  });
-  if (!existing) notFound();
-  if (existing.createdByProfileId !== profile.id) return;
-
-  await prisma.event.delete({ where: { id: eventId } });
-
-  revalidatePath(`/sports/${existing.sport}`);
-  revalidatePath("/home");
-  redirect(`/sports/${existing.sport}`);
-}
-
 export async function requestSportAction(
   _prev: FormState,
   form: FormData,
